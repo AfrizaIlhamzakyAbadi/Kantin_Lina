@@ -1,10 +1,8 @@
 const rupiah = new Intl.NumberFormat('id-ID', {
-  style: 'currency',
-  currency: 'IDR',
   maximumFractionDigits: 0,
 })
 
-export const formatRupiah = (amount) => rupiah.format(Number(amount) || 0)
+export const formatRupiah = (amount) => 'Rp ' + rupiah.format(Number(amount) || 0)
 
 // 125000 ms -> "02:05"
 export function formatCountdown(ms) {

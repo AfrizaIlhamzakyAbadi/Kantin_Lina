@@ -82,8 +82,11 @@ export default function MenuManager() {
           <input required value={category} onChange={e=>setCategory(e.target.value)} placeholder="e.g. Food, Drink" style={{ width: '100%', padding: '0.5rem', borderRadius: '4px', border: '1px solid var(--border)' }} />
         </div>
         <div>
-          <label style={{ display: 'block', fontSize: '0.9rem' }}>Price (Rp)</label>
-          <input required type="number" value={price} onChange={e=>setPrice(e.target.value)} style={{ width: '100%', padding: '0.5rem', borderRadius: '4px', border: '1px solid var(--border)' }} />
+          <label style={{ display: 'block', fontSize: '0.9rem' }}>Price</label>
+          <div style={{ display: 'flex', alignItems: 'center' }}>
+            <span style={{ padding: '0.5rem', background: 'var(--bg-accent)', border: '1px solid var(--border)', borderRight: 'none', borderRadius: '4px 0 0 4px', fontSize: '0.9rem', color: 'var(--text-muted)' }}>Rp</span>
+            <input required type="number" value={price} onChange={e=>setPrice(e.target.value)} style={{ flex: 1, padding: '0.5rem', borderRadius: '0 4px 4px 0', border: '1px solid var(--border)' }} />
+          </div>
         </div>
         <div>
           <label style={{ display: 'block', fontSize: '0.9rem' }}>Stock Quantity</label>

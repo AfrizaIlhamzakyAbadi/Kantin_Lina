@@ -42,16 +42,16 @@ export default function Orders() {
         {orders.map(order => (
           <div key={order.id} style={{ padding: '1.5rem', background: 'var(--surface)', borderRadius: 'var(--radius)', boxShadow: 'var(--shadow-sm)', border: '1px solid var(--border)', display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
             <div>
-              <h3 style={{ margin: 0, fontSize: '1.25rem' }}>{order.customerName}</h3>
+              <h3 style={{ margin: 0, fontSize: '1.25rem' }}>{order.pickupName}</h3>
               <p style={{ color: 'var(--text-muted)', fontSize: '0.9rem', marginTop: '0.25rem' }}>ID: {order.id}</p>
               <div style={{ marginTop: '0.5rem' }}>
-                {Object.entries(order.items || {}).map(([id, qty]) => (
-                  <span key={id} style={{ display: 'inline-block', marginRight: '1rem', background: 'var(--bg-accent)', padding: '0.25rem 0.5rem', borderRadius: '4px', fontSize: '0.85rem' }}>
-                    {id} x{qty}
+                {(order.items || []).map((item, idx) => (
+                  <span key={idx} style={{ display: 'inline-block', marginRight: '1rem', background: 'var(--bg-accent)', padding: '0.25rem 0.5rem', borderRadius: '4px', fontSize: '0.85rem' }}>
+                    {item.name || item.id} x{item.qty}
                   </span>
                 ))}
               </div>
-              <p style={{ marginTop: '0.5rem', fontWeight: 'bold' }}>Rp {order.totalAmount?.toLocaleString('id-ID')}</p>
+              <p style={{ marginTop: '0.5rem', fontWeight: 'bold' }}>Rp {order.total?.toLocaleString('id-ID')}</p>
             </div>
             
             <div style={{ textAlign: 'right' }}>
