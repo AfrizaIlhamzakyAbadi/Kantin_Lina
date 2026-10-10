@@ -19,6 +19,13 @@ service cloud.firestore {
       allow write: if false;
     }
 
+    // Owner-managed settings such as `settings/schedule` (pickup days/hours).
+    // Read-only for clients; the owner edits it in the Firebase Console.
+    match /settings/{docId} {
+      allow read: if true;
+      allow write: if false;
+    }
+
     // Deny everything else by default.
     match /{document=**} {
       allow read, write: if false;

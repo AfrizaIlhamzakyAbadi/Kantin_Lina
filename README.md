@@ -116,6 +116,17 @@ https://<your-site>.pages.dev/api/webhook
 
 (For local testing, expose port 8788 with a tunnel such as `cloudflared tunnel --url http://localhost:8788`.)
 
+## Firestore data
+
+Created by the owner in the Firebase Console (clients can only read them):
+
+| Path | Fields |
+|---|---|
+| `menu/{itemId}` | `name` (string), `price` (number, IDR), `stock` (number), optional `description`, `imageUrl`, `category`, `available` (boolean, `false` hides the item) |
+| `settings/schedule` | optional `days` (array, `0`=Sun … `6`=Sat, default `[1,2,3,4,5]`), `openTime` (`"08:00"`), `closeTime` (`"16:00"`), `closedDates` (array of `"YYYY-MM-DD"`). If the doc is missing, Mon-Fri 08:00-16:00 is used. |
+
+The exact `stock` number is never shown to customers; they only see "Sold out".
+
 ## Firestore rules
 
 `firestore.rules` is a **dummy**: clients can read but never write `menu` / `orders`. Writes happen only from Cloudflare Functions using the service account.

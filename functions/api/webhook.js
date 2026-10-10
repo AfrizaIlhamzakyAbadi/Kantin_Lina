@@ -4,7 +4,9 @@
 //   https://<your-site>.pages.dev/api/webhook
 //
 // Required env: MIDTRANS_SERVER_KEY
-// For the Firestore update (TODO): FIREBASE_PROJECT_ID, FIREBASE_CLIENT_EMAIL, FIREBASE_PRIVATE_KEY
+// For the Firestore update: FIREBASE_PROJECT_ID, FIREBASE_CLIENT_EMAIL, FIREBASE_PRIVATE_KEY
+
+import { recordPayment, releaseOrder, ORDER_STATUS } from '../_lib/orders.js'
 
 const json = (body, status = 200) =>
   new Response(JSON.stringify(body), {
@@ -45,12 +47,24 @@ export async function onRequestPost({ request, env }) {
     (!fraud_status || fraud_status === 'accept')
   const isFailed = ['deny', 'cancel', 'expire', 'failure'].includes(transaction_status)
 
-  // 3. TODO: update Firestore `orders/{order_id}` server-side.
-  //    Workers can't run firebase-admin; use the Firestore REST API with a
-  //    service-account OAuth token (FIREBASE_* env vars), e.g.:
-  //    PATCH https://firestore.googleapis.com/v1/projects/{FIREBASE_PROJECT_ID}/databases/(default)/documents/orders/{order_id}?updateMask.fieldPaths=status
-  //    status -> isPaid ? 'paid' : isFailed ? 'failed' : 'pending'
+  // 3. Update Firestore `orders/{order_id}` server-side.
   console.log(`[webhook] order=${order_id} status=${transaction_status} paid=${isPaid} failed=${isFailed}`)
+
+  try {
+    if (isPaid) {
+      await recordPayment(env, {
+        orderId: order_id,
+        grossAmount: Number(notification.gross_amount),
+        transactionId: notification.transaction_id,
+      })
+    } else if (isFailed) {
+      await releaseOrder(env, order_id, ORDER_STATUS.FAILED, `midtrans-${transaction_status}`)
+    }
+  } catch (error) {
+    console.error(`[webhook] error processing order ${order_id}:`, error)
+    // If it's a Firestore/transaction error, return 500 so Midtrans retries
+    return json({ error: 'Internal Server Error' }, 500)
+  }
 
   // Midtrans expects a 200 response to stop retrying.
   return json({ received: true })
