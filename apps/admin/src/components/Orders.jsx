@@ -62,6 +62,12 @@ export default function Orders() {
     }
   }
 
+  const formatTime = (val) => {
+    if (!val) return ''
+    const d = typeof val.toDate === 'function' ? val.toDate() : new Date(val)
+    return d.toLocaleString('en-GB', { weekday: 'short', day: 'numeric', month: 'short', hour: '2-digit', minute: '2-digit' })
+  }
+
   return (
     <div>
       <h2>Real-Time Orders</h2>
@@ -71,6 +77,13 @@ export default function Orders() {
             <div>
               <h3 style={{ margin: 0, fontSize: '1.25rem' }}>{order.pickupName}</h3>
               <p style={{ color: 'var(--text-muted)', fontSize: '0.9rem', marginTop: '0.25rem' }}>ID: {order.id}</p>
+              
+              {(order.status === 'Paid' || order.status === 'Completed') && order.pickupAt && (
+                <p style={{ color: 'var(--primary-strong)', fontSize: '0.95rem', marginTop: '0.25rem', fontWeight: 'bold' }}>
+                  Pickup at: {formatTime(order.pickupAt)}
+                </p>
+              )}
+
               <div style={{ marginTop: '0.5rem' }}>
                 {Array.isArray(order.items) 
                   ? order.items.map((item, idx) => (
@@ -88,12 +101,12 @@ export default function Orders() {
               <p style={{ marginTop: '0.5rem', fontWeight: 'bold' }}>Rp {order.total?.toLocaleString('id-ID')}</p>
               {order.paidAt && !order.completedAt && (
                 <p style={{ color: 'var(--success)', fontSize: '0.85rem', marginTop: '0.25rem' }}>
-                  Paid on: {typeof order.paidAt?.toDate === 'function' ? order.paidAt.toDate().toLocaleString('id-ID') : new Date(order.paidAt).toLocaleString('id-ID')}
+                  Paid on: {formatTime(order.paidAt)}
                 </p>
               )}
               {order.completedAt && (
                 <p style={{ color: 'var(--text-muted)', fontSize: '0.85rem', marginTop: '0.25rem' }}>
-                  Finished on: {typeof order.completedAt?.toDate === 'function' ? order.completedAt.toDate().toLocaleString('id-ID') : new Date(order.completedAt).toLocaleString('id-ID')}
+                  Finished on: {formatTime(order.completedAt)}
                 </p>
               )}
             </div>
