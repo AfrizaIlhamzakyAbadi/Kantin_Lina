@@ -33,7 +33,19 @@ export default function Orders() {
           return new Date(val).getTime() || 0
         }
         
-        return getTime(a.createdAt) - getTime(b.createdAt)
+        const pickupA = getTime(a.pickupAt)
+        const pickupB = getTime(b.pickupAt)
+        
+        if (pickupA !== pickupB) {
+          if (pickupA === 0) return 1
+          if (pickupB === 0) return -1
+          return pickupA - pickupB
+        }
+        
+        const paidA = getTime(a.paidAt || a.createdAt)
+        const paidB = getTime(b.paidAt || b.createdAt)
+        
+        return paidA - paidB
       })
 
       setOrders(data)
