@@ -9,6 +9,33 @@ export default function Orders() {
     const q = query(collection(db, 'orders'), orderBy('createdAt', 'desc'))
     const unsubscribe = onSnapshot(q, (snapshot) => {
       const data = snapshot.docs.map(doc => ({ id: doc.id, ...doc.data() }))
+      
+      const statusPriority = {
+        'Paid': 1,
+        'Pending': 2,
+        'Completed': 3,
+        'Finished': 3, // Fallback just in case
+        'Expired': 4
+      }
+
+      data.sort((a, b) => {
+        const priorityA = statusPriority[a.status] || 99
+        const priorityB = statusPriority[b.status] || 99
+        
+        if (priorityA !== priorityB) {
+          return priorityA - priorityB
+        }
+        
+        const getTime = (val) => {
+          if (!val) return 0
+          if (typeof val.toMillis === 'function') return val.toMillis()
+          if (typeof val.toDate === 'function') return val.toDate().getTime()
+          return new Date(val).getTime() || 0
+        }
+        
+        return getTime(a.createdAt) - getTime(b.createdAt)
+      })
+
       setOrders(data)
     })
     return () => unsubscribe()
