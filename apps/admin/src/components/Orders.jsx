@@ -86,6 +86,16 @@ export default function Orders() {
                 }
               </div>
               <p style={{ marginTop: '0.5rem', fontWeight: 'bold' }}>Rp {order.total?.toLocaleString('id-ID')}</p>
+              {order.paidAt && !order.completedAt && (
+                <p style={{ color: 'var(--success)', fontSize: '0.85rem', marginTop: '0.25rem' }}>
+                  Paid on: {typeof order.paidAt?.toDate === 'function' ? order.paidAt.toDate().toLocaleString('id-ID') : new Date(order.paidAt).toLocaleString('id-ID')}
+                </p>
+              )}
+              {order.completedAt && (
+                <p style={{ color: 'var(--text-muted)', fontSize: '0.85rem', marginTop: '0.25rem' }}>
+                  Finished on: {typeof order.completedAt?.toDate === 'function' ? order.completedAt.toDate().toLocaleString('id-ID') : new Date(order.completedAt).toLocaleString('id-ID')}
+                </p>
+              )}
             </div>
             
             <div style={{ textAlign: 'right' }}>
