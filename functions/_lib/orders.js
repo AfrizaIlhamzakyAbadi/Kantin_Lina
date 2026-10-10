@@ -7,11 +7,11 @@
 // Orders are never deleted, so financial records are preserved.
 
 import { queryByField, runTransaction } from './firestore.js'
-import { EXPIRY_GRACE_MS } from '../../src/lib/constants.js'
+import { EXPIRY_GRACE_MS } from '../../apps/customer/src/lib/constants.js'
 
 // The customer's payment window. Imported from the frontend constants so the
 // countdown on screen and the server deadline can never drift apart.
-export { PAYMENT_WINDOW_MS, MAX_QTY_PER_ITEM, EXPIRY_GRACE_MS } from '../../src/lib/constants.js'
+export { PAYMENT_WINDOW_MS, MAX_QTY_PER_ITEM, EXPIRY_GRACE_MS } from '../../apps/customer/src/lib/constants.js'
 
 export const ORDER_STATUS = {
   PENDING: 'Pending',
