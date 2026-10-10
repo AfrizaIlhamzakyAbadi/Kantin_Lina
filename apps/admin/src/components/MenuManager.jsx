@@ -35,14 +35,14 @@ export default function MenuManager() {
     setName(item.name)
     setPrice(item.price)
     setStock(item.stock)
-    setImage(item.image)
+    setImage(item.imageUrl || item.image || '')
     setCategory(item.category || '')
   }
 
   const handleSave = async (e) => {
     e.preventDefault()
     try {
-      const data = { name, price: Number(price), stock: Number(stock), image, category }
+      const data = { name, price: Number(price), stock: Number(stock), imageUrl: image, category }
       if (editingId) {
         await updateDoc(doc(db, 'menu', editingId), data)
       } else {
@@ -111,7 +111,7 @@ export default function MenuManager() {
       <div style={{ display: 'grid', gap: '1rem', gridTemplateColumns: 'repeat(auto-fill, minmax(300px, 1fr))' }}>
         {menu.map(item => (
           <div key={item.id} style={{ background: 'var(--surface)', borderRadius: 'var(--radius)', border: '1px solid var(--border)', overflow: 'hidden', display: 'flex', flexDirection: 'column' }}>
-            <img src={item.image} alt={item.name} style={{ width: '100%', height: '150px', objectFit: 'cover' }} />
+            <img src={item.imageUrl || item.image} alt={item.name} style={{ width: '100%', height: '150px', objectFit: 'cover' }} />
             <div style={{ padding: '1rem', flex: 1, display: 'flex', flexDirection: 'column' }}>
               <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start' }}>
                 <h4 style={{ margin: 0 }}>{item.name}</h4>

@@ -13,7 +13,7 @@ function toMenuItem(id, data) {
     name: String(data.name ?? 'Untitled item'),
     price: Number(data.price) || 0,
     description: data.description ? String(data.description) : '',
-    imageUrl: data.imageUrl ? String(data.imageUrl) : '',
+    imageUrl: (data.imageUrl || data.image) ? String(data.imageUrl || data.image) : '',
     category: data.category ? String(data.category) : '',
     soldOut: !(Number(data.stock) > 0),
     available: data.available !== false,
