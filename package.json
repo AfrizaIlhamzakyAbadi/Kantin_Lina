@@ -3,12 +3,15 @@
   "private": true,
   "version": "0.0.0",
   "type": "module",
+  "workspaces": [
+    "apps/*"
+  ],
   "scripts": {
-    "dev": "vite",
-    "build": "vite build",
-    "lint": "oxlint",
-    "preview": "vite preview",
-    "dev:cf": "wrangler pages dev ./dist"
+    "dev:customer": "npm run dev -w apps/customer",
+    "dev:admin": "npm run dev -w apps/admin",
+    "build:customer": "npm run build -w apps/customer",
+    "build:admin": "npm run build -w apps/admin",
+    "lint": "oxlint"
   },
   "dependencies": {
     "firebase": "^13.0.0",
