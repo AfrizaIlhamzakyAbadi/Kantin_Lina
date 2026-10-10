@@ -1,6 +1,7 @@
 # Kantin Lina 🍱
 
 Pre-order food system for a school canteen.
+prompted by Friza Cocoa
 
 | Layer | Tech |
 |---|---|
