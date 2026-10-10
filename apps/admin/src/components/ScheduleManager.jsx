@@ -76,7 +76,7 @@ export default function ScheduleManager() {
           </div>
         </div>
 
-        <div style={{ display: 'flex', gap: '2rem', marginBottom: '2rem' }}>
+        <div className="admin-schedule-times" style={{ display: 'flex', gap: '2rem', marginBottom: '2rem' }}>
           <div style={{ flex: 1 }}>
             <label style={{ display: 'block', marginBottom: '0.5rem', fontWeight: 'bold' }}>Opening Time</label>
             <input 

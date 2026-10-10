@@ -115,3 +115,13 @@ select {
     transition-duration: 0.01ms !important;
   }
 }
+
+/* Responsive overrides for Admin */
+@media (max-width: 600px) {
+  .admin-tabs { flex-wrap: wrap; }
+  .admin-tabs button { flex: 1 1 calc(50% - 0.5rem); text-align: center; }
+  .admin-order-card { flex-direction: column; align-items: stretch !important; gap: 1rem; }
+  .admin-order-card > div:last-child { text-align: left !important; display: flex; justify-content: space-between; align-items: center; }
+  .admin-menu-form { grid-template-columns: 1fr !important; }
+  .admin-schedule-times { flex-direction: column; gap: 1rem !important; }
+}

@@ -69,7 +69,7 @@ export default function MenuManager() {
     <div>
       <h2>Menu & Stock Management</h2>
       
-      <form onSubmit={handleSave} style={{ background: 'var(--surface)', padding: '1.5rem', borderRadius: 'var(--radius)', border: '1px solid var(--border)', marginBottom: '2rem', display: 'grid', gap: '1rem', gridTemplateColumns: '1fr 1fr' }}>
+      <form onSubmit={handleSave} className="admin-menu-form" style={{ background: 'var(--surface)', padding: '1.5rem', borderRadius: 'var(--radius)', border: '1px solid var(--border)', marginBottom: '2rem', display: 'grid', gap: '1rem', gridTemplateColumns: '1fr 1fr' }}>
         <div style={{ gridColumn: '1 / -1' }}>
           <h3>{editingId ? 'Edit Item' : 'Add New Item'}</h3>
         </div>

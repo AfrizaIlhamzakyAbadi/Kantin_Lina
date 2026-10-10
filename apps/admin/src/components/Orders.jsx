@@ -40,7 +40,7 @@ export default function Orders() {
       <h2>Real-Time Orders</h2>
       <div style={{ display: 'grid', gap: '1rem', marginTop: '1rem' }}>
         {orders.map(order => (
-          <div key={order.id} style={{ padding: '1.5rem', background: 'var(--surface)', borderRadius: 'var(--radius)', boxShadow: 'var(--shadow-sm)', border: '1px solid var(--border)', display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+          <div key={order.id} className="admin-order-card" style={{ padding: '1.5rem', background: 'var(--surface)', borderRadius: 'var(--radius)', boxShadow: 'var(--shadow-sm)', border: '1px solid var(--border)', display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
             <div>
               <h3 style={{ margin: 0, fontSize: '1.25rem' }}>{order.pickupName}</h3>
               <p style={{ color: 'var(--text-muted)', fontSize: '0.9rem', marginTop: '0.25rem' }}>ID: {order.id}</p>

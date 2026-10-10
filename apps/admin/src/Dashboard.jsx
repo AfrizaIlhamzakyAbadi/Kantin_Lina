@@ -14,7 +14,7 @@ export default function Dashboard() {
 
   return (
     <div>
-      <div style={{ display: 'flex', gap: '1rem', marginBottom: '2rem', borderBottom: '1px solid var(--border)', paddingBottom: '1rem' }}>
+      <div className="admin-tabs" style={{ display: 'flex', gap: '1rem', marginBottom: '2rem', borderBottom: '1px solid var(--border)', paddingBottom: '1rem' }}>
         {tabs.map(tab => (
           <button
             key={tab.id}
