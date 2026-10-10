@@ -7,7 +7,7 @@ import useActiveOrder from '../hooks/useActiveOrder.js'
 import useCountdown from '../hooks/useCountdown.js'
 import { setActiveOrder } from '../lib/storage.js'
 import { formatRupiah } from '../lib/format.js'
-import { cleanName, makePickupName } from '../lib/orderName.js'
+import { cleanName } from '../lib/orderName.js'
 import { resolveExpiry } from '../lib/payment.js'
 import { getPickupDays, getSlotsForDate, toPickupDate, formatScheduleDays } from '../lib/schedule.js'
 import { MAX_NAME_LENGTH, MAX_QTY_PER_ITEM, MIN_NAME_LENGTH } from '../lib/constants.js'
@@ -65,7 +65,7 @@ export default function Cart() {
       return
     }
 
-    const pickupName = makePickupName(customerName)
+    const pickupName = cleanName(customerName)
     const pickupAt = toPickupDate(dayKey, timeValue).toISOString()
 
     setSubmitting(true)
@@ -87,7 +87,7 @@ export default function Cart() {
       // Prefer the server's deadline; fall back to now + 3 minutes.
       setActiveOrder({
         orderId: data.orderId,
-        pickupName,
+        pickupName: data.pickupName || pickupName,
         pickupAt,
         qrUrl: data.qrUrl ?? null,
         qrString: data.qrString ?? null,
@@ -158,8 +158,8 @@ export default function Cart() {
               onChange={(e) => setCustomerName(e.target.value)}
             />
             <small>
-              We add a random number so staff can call a unique name
-              {nameOk && <> (e.g. <strong>{cleanName(customerName)}-492</strong>)</>}.
+              We add a daily queue number so staff can call a unique name
+              {nameOk && <> (e.g. <strong>{cleanName(customerName)}-1</strong>)</>}.
             </small>
           </label>
 

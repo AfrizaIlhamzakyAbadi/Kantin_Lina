@@ -27,7 +27,7 @@ const midtransBaseUrl = (env) =>
 
 const MAX_DISTINCT_ITEMS = 20
 const MAX_BOOKING_AHEAD_MS = 8 * 24 * 60 * 60 * 1000
-const PICKUP_NAME_PATTERN = /^[^\r\n]{2,20}-\d{3}$/ // "Budi-492"
+const PICKUP_NAME_PATTERN = /^[^\r\n]{2,30}$/ // "Budi"
 
 // Thrown for expected failures; carries the HTTP status to answer with.
 class HttpError extends Error {
@@ -42,7 +42,7 @@ function parseRequest(payload) {
   const { customerName, pickupAt, items } = payload ?? {}
 
   if (typeof customerName !== 'string' || !PICKUP_NAME_PATTERN.test(customerName.trim())) {
-    throw new HttpError(400, 'customerName must look like "Name-123"')
+    throw new HttpError(400, 'customerName must be a valid string (2-30 characters)')
   }
 
   const pickupDate = new Date(pickupAt)
@@ -85,16 +85,21 @@ function parseRequest(payload) {
 // Step 2: atomic stock check + deduction + order creation.
 async function reserveStock(env, { orderId, pickupName, pickupDate, items }) {
   return runTransaction(env, async (tx) => {
-    const docs = await tx.getAll(items.map((item) => `menu/${item.id}`))
+    // We use a counter for today to assign queue numbers (-1, -2, etc)
+    // Using Cloudflare Workers standard format YYYY-MM-DD in UTC or simple ISO
+    const today = new Date().toISOString().split('T')[0]
+    const counterPath = `counters/queue_${today}`
+    
+    const docs = await tx.getAll([counterPath, ...items.map((item) => `menu/${item.id}`)])
 
     const lines = []
     const unavailable = []
     for (const item of items) {
       const doc = docs.get(`menu/${item.id}`)
-      const stock = Number(doc?.data.stock)
+      const stock = Number(doc?.data?.stock)
 
       if (!doc || doc.data.available === false || !(stock >= item.qty)) {
-        unavailable.push({ id: item.id, name: doc?.data.name ?? item.id })
+        unavailable.push({ id: item.id, name: doc?.data?.name ?? item.id })
         continue
       }
 
@@ -124,6 +129,17 @@ async function reserveStock(env, { orderId, pickupName, pickupDate, items }) {
       )
     }
 
+    // Queue logic
+    const counterDoc = docs.get(counterPath)
+    const queueNumber = (counterDoc?.data?.count || 0) + 1
+    const finalPickupName = `${pickupName}-${queueNumber}`
+
+    if (counterDoc) {
+      tx.update(counterPath, { count: queueNumber })
+    } else {
+      tx.create(counterPath, { count: queueNumber })
+    }
+
     const total = lines.reduce((sum, l) => sum + l.price * l.qty, 0)
     const createdAt = new Date()
     const expiresAt = new Date(createdAt.getTime() + PAYMENT_WINDOW_MS)
@@ -132,7 +148,7 @@ async function reserveStock(env, { orderId, pickupName, pickupDate, items }) {
 
     tx.create(`orders/${orderId}`, {
       status: ORDER_STATUS.PENDING,
-      pickupName,
+      pickupName: finalPickupName,
       pickupAt: pickupDate,
       items: lines.map(({ id, name, price, qty }) => ({ id, name, price, qty })),
       total,
@@ -141,7 +157,7 @@ async function reserveStock(env, { orderId, pickupName, pickupDate, items }) {
       expiresAt,
     })
 
-    return { lines, total, expiresAt }
+    return { lines, total, expiresAt, finalPickupName }
   })
 }
 
@@ -202,7 +218,7 @@ export async function onRequestPost({ request, env }) {
     const reservation = await reserveStock(env, { orderId, pickupName, pickupDate, items })
     stockReserved = true
 
-    const charge = await requestQris(env, { orderId, pickupName, ...reservation })
+    const charge = await requestQris(env, { orderId, pickupName: reservation.finalPickupName, ...reservation })
     const qrAction = charge.actions?.find((a) => a.name === 'generate-qr-code')
 
     // Non-critical bookkeeping; the order is already valid without it.
@@ -213,6 +229,7 @@ export async function onRequestPost({ request, env }) {
     return json({
       orderId,
       status: ORDER_STATUS.PENDING,
+      pickupName: reservation.finalPickupName,
       total: reservation.total,
       expiresAt: reservation.expiresAt.toISOString(),
       transactionStatus: charge.transaction_status,
