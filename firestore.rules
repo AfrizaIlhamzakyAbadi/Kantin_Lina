@@ -1,0 +1,27 @@
+rules_version = '2';
+
+// DUMMY RULES - tighten before going to production.
+// - Clients may READ menu and orders.
+// - Clients may NOT write to `menu` or `orders` at all.
+//   Orders are created/updated only by Cloudflare Functions using the
+//   Firebase service account (Admin credentials bypass these rules).
+service cloud.firestore {
+  match /databases/{database}/documents {
+
+    match /menu/{itemId} {
+      allow read: if true;
+      allow write: if false;
+    }
+
+    match /orders/{orderId} {
+      // TODO: restrict reads (e.g. by order token) once auth model is decided.
+      allow read: if true;
+      allow write: if false;
+    }
+
+    // Deny everything else by default.
+    match /{document=**} {
+      allow read, write: if false;
+    }
+  }
+}
