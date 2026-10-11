@@ -2,6 +2,18 @@ import { useEffect, useState } from 'react'
 import { collection, onSnapshot } from 'firebase/firestore'
 import { db } from '../firebase/config.js'
 
+export const MENU_CATEGORIES = ['Food', 'Drink', 'Other']
+
+export function normalizeCategory(category) {
+  if (!category) return 'Other'
+  const trimmed = String(category).trim()
+  if (MENU_CATEGORIES.includes(trimmed)) return trimmed
+  const lower = trimmed.toLowerCase()
+  if (lower.includes('food') || lower.includes('makan')) return 'Food'
+  if (lower.includes('drink') || lower.includes('minum') || lower.includes('beverag')) return 'Drink'
+  return 'Other'
+}
+
 // Live menu from Firestore `menu`. Expected fields per doc:
 //   name, price, stock, [description], [imageUrl], [category], [available]
 //
@@ -13,8 +25,8 @@ function toMenuItem(id, data) {
     name: String(data.name ?? 'Untitled item'),
     price: Number(data.price) || 0,
     description: data.description ? String(data.description) : '',
-    imageUrl: data.imageUrl ? String(data.imageUrl) : '',
-    category: data.category ? String(data.category) : '',
+    imageUrl: (data.imageUrl || data.image) ? String(data.imageUrl || data.image) : '',
+    category: normalizeCategory(data.category),
     soldOut: !(Number(data.stock) > 0),
     available: data.available !== false,
   }

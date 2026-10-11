@@ -1,8 +1,12 @@
-const rupiah = new Intl.NumberFormat('id-ID', {
-  maximumFractionDigits: 0,
-})
-
-export const formatRupiah = (amount) => 'Rp ' + rupiah.format(Number(amount) || 0)
+export const formatRupiah = (amount) => {
+  const num = Number(amount) || 0
+  if (num === 0) return 'Rp 0k'
+  const inK = (num > 0 && num < 100) ? num : num / 1000
+  const formatted = Number.isInteger(inK)
+    ? inK.toString()
+    : parseFloat(inK.toFixed(2)).toString()
+  return `Rp ${formatted}k`
+}
 
 // 125000 ms -> "02:05"
 export function formatCountdown(ms) {

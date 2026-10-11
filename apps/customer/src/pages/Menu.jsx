@@ -1,5 +1,5 @@
 import { Link } from 'react-router-dom'
-import useMenu from '../hooks/useMenu.js'
+import useMenu, { MENU_CATEGORIES } from '../hooks/useMenu.js'
 import { useCart } from '../context/cartContext.js'
 import { formatRupiah } from '../lib/format.js'
 import { MAX_QTY_PER_ITEM } from '../lib/constants.js'
@@ -77,6 +77,11 @@ export default function Menu() {
   const { items, loading, error } = useMenu()
   const { totalQty, totalPrice } = useCart()
 
+  const groupedItems = MENU_CATEGORIES.map((category) => ({
+    category,
+    items: items.filter((item) => item.category === category),
+  }))
+
   return (
     <div className="container page has-cart-bar">
       <header className="page-head">
@@ -97,10 +102,20 @@ export default function Menu() {
       )}
 
       {!loading && items.length > 0 && (
-        <div className="menu-grid">
-          {items.map((item) => (
-            <MenuCard key={item.id} item={item} />
-          ))}
+        <div className="menu-sections">
+          {groupedItems.map(({ category, items: catItems }) => {
+            if (catItems.length === 0) return null
+            return (
+              <section key={category} className="menu-category-section" aria-labelledby={`cat-head-${category}`}>
+                <h2 id={`cat-head-${category}`} className="menu-category-heading">{category}</h2>
+                <div className="menu-grid">
+                  {catItems.map((item) => (
+                    <MenuCard key={item.id} item={item} />
+                  ))}
+                </div>
+              </section>
+            )
+          })}
         </div>
       )}
 

@@ -93,7 +93,7 @@
 .menu-card { overflow: hidden; display: flex; flex-direction: column; transition: transform 0.2s, box-shadow 0.2s; }
 .menu-card:hover { transform: translateY(-3px); box-shadow: var(--shadow); }
 .menu-media {
-  position: relative; aspect-ratio: 16 / 10; overflow: hidden;
+  position: relative; aspect-ratio: 1 / 1; overflow: hidden;
   background: linear-gradient(135deg, var(--surface-2), var(--primary-soft));
   display: grid; place-items: center;
 }

@@ -1,6 +1,7 @@
 import { useState, useEffect } from 'react'
 import { collection, onSnapshot, query, orderBy, updateDoc, doc } from 'firebase/firestore'
 import { db } from '../firebase/config.js'
+import { formatRupiah } from '../lib/format.js'
 
 export default function Orders() {
   const [orders, setOrders] = useState([])
@@ -110,7 +111,7 @@ export default function Orders() {
                     ))
                 }
               </div>
-              <p style={{ marginTop: '0.5rem', fontWeight: 'bold' }}>Rp {order.total?.toLocaleString('id-ID')}</p>
+              <p style={{ marginTop: '0.5rem', fontWeight: 'bold' }}>{formatRupiah(order.total)}</p>
               {order.paidAt && !order.completedAt && (
                 <p style={{ color: 'var(--success)', fontSize: '0.85rem', marginTop: '0.25rem' }}>
                   Paid on: {formatTime(order.paidAt)}
