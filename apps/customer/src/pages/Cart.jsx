@@ -5,7 +5,7 @@ import useMenu from '../hooks/useMenu.js'
 import useSchedule from '../hooks/useSchedule.js'
 import useActiveOrder from '../hooks/useActiveOrder.js'
 import useCountdown from '../hooks/useCountdown.js'
-import { setActiveOrder } from '../lib/storage.js'
+import { setActiveOrder, clearActiveOrder } from '../lib/storage.js'
 import { formatRupiah } from '../lib/format.js'
 import { cleanName } from '../lib/orderName.js'
 import { resolveExpiry } from '../lib/payment.js'
@@ -14,7 +14,7 @@ import { MAX_NAME_LENGTH, MAX_QTY_PER_ITEM, MIN_NAME_LENGTH } from '../lib/const
 
 export default function Cart() {
   const navigate = useNavigate()
-  const { lines, customerName, setCustomerName, setQty, clearCart } = useCart()
+  const { lines, customerName, setCustomerName, orderNotes, setOrderNotes, setQty, clearCart } = useCart()
   const { items: menuItems, loading: menuLoading } = useMenu()
   const { schedule, usingDefault } = useSchedule()
   const activeOrder = useActiveOrder()
@@ -22,6 +22,7 @@ export default function Cart() {
   const [pickupDay, setPickupDay] = useState('')
   const [pickupTime, setPickupTime] = useState('')
   const [submitting, setSubmitting] = useState(false)
+  const [cancellingPending, setCancellingPending] = useState(false)
   const [error, setError] = useState('')
 
   // Show live menu prices, and flag lines whose item sold out or was removed.
@@ -45,7 +46,7 @@ export default function Cart() {
   const timeValue = slots.includes(pickupTime) ? pickupTime : ''
 
   // A QR that is still within its 3 minute window must be finished (or allowed
-  // to expire) first, otherwise a second checkout would overwrite it.
+  // to expire or be cancelled) first, otherwise a second checkout would overwrite it.
   const activeRemaining = useCountdown(activeOrder?.expiresAt ?? null)
   const paymentInProgress = activeRemaining !== null && activeRemaining > 0
 
@@ -76,6 +77,7 @@ export default function Cart() {
         body: JSON.stringify({
           customerName: pickupName,
           pickupAt,
+          notes: orderNotes?.trim() || '',
           items: viewLines.map(({ id, qty }) => ({ id, qty })),
         }),
       })
@@ -89,6 +91,7 @@ export default function Cart() {
         orderId: data.orderId,
         pickupName: data.pickupName || pickupName,
         pickupAt,
+        notes: data.notes || orderNotes?.trim() || '',
         qrUrl: data.qrUrl ?? null,
         qrString: data.qrString ?? null,
         expiresAt: resolveExpiry(data.expiresAt),
@@ -163,6 +166,19 @@ export default function Cart() {
             </small>
           </label>
 
+          <label className="field" htmlFor="order-notes">
+            <span>Message / Notes (optional)</span>
+            <textarea
+              id="order-notes"
+              rows="2"
+              maxLength={200}
+              placeholder="e.g. Sambal dipisah, jangan pakai es, tidak terlalu pedas..."
+              value={orderNotes || ''}
+              onChange={(e) => setOrderNotes(e.target.value)}
+            />
+            <small>Special requests for the kitchen (max 200 chars).</small>
+          </label>
+
           {days.length === 0 ? (
             <div className="notice notice-warn" role="status">
               Pickup is not available in the next few days. Hours: {formatScheduleDays(schedule)},{' '}
@@ -199,9 +215,38 @@ export default function Cart() {
           </div>
 
           {paymentInProgress && (
-            <div className="notice notice-warn" role="status">
-              You have a payment in progress.{' '}
-              <Link to={`/payment/${activeOrder.orderId}`}>Return to your QR code</Link>.
+            <div className="notice notice-warn" role="status" style={{ display: 'flex', flexDirection: 'column', gap: '8px' }}>
+              <div>
+                You have an unpaid order pending.{' '}
+                <Link to={`/payment/${activeOrder.orderId}`}><strong>Go to QR code</strong></Link>.
+              </div>
+              <div>
+                <button
+                  type="button"
+                  className="btn btn-ghost btn-sm"
+                  style={{ color: 'var(--danger)', borderColor: 'var(--border)', padding: '5px 12px', fontSize: '0.85rem' }}
+                  disabled={cancellingPending}
+                  onClick={async () => {
+                    if (window.confirm('Cancel your pending order so you can checkout now? Reserved stock will be restored.')) {
+                      setCancellingPending(true)
+                      try {
+                        await fetch('/api/cancel', {
+                          method: 'POST',
+                          headers: { 'Content-Type': 'application/json' },
+                          body: JSON.stringify({ orderId: activeOrder.orderId }),
+                        })
+                      } catch (e) {
+                        console.error(e)
+                      } finally {
+                        clearActiveOrder()
+                        setCancellingPending(false)
+                      }
+                    }
+                  }}
+                >
+                  {cancellingPending ? 'Cancelling pending order…' : 'Cancel pending order'}
+                </button>
+              </div>
             </div>
           )}
           {hasUnavailable && (

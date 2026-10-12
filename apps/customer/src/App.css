@@ -60,6 +60,8 @@
 .btn-primary:hover:not(:disabled) { box-shadow: 0 14px 34px -10px rgba(228, 87, 46, 0.6); }
 .btn-ghost { background: var(--surface); color: var(--text); border-color: var(--border); }
 .btn-ghost:hover:not(:disabled) { border-color: var(--primary); color: var(--primary); }
+.btn-danger { background: var(--danger-soft); color: var(--danger); border-color: transparent; }
+.btn-danger:hover:not(:disabled) { background: var(--danger); color: #fff; }
 .btn-sm { padding: 7px 16px; font-size: 0.9rem; }
 .btn-lg { padding: 14px 26px; font-size: 1.05rem; }
 .btn-block { width: 100%; }
@@ -166,11 +168,12 @@
 .field { display: flex; flex-direction: column; gap: 6px; }
 .field > span { font-weight: 600; font-size: 0.9rem; }
 .field small { color: var(--text-muted); font-size: 0.8rem; }
-.field input, .field select {
+.field input, .field select, .field textarea {
   width: 100%; padding: 12px 14px; border-radius: var(--radius-sm);
   border: 1px solid var(--border); background: var(--surface-2); transition: border-color 0.2s, box-shadow 0.2s;
+  font-family: inherit; font-size: inherit; resize: vertical;
 }
-.field input:focus, .field select:focus { outline: none; border-color: var(--primary); box-shadow: 0 0 0 4px var(--primary-soft); }
+.field input:focus, .field select:focus, .field textarea:focus { outline: none; border-color: var(--primary); box-shadow: 0 0 0 4px var(--primary-soft); }
 .field-row { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; }
 @media (max-width: 420px) { .field-row { grid-template-columns: 1fr; } }
 

@@ -16,7 +16,8 @@ export default function Orders() {
         'Pending': 2,
         'Completed': 3,
         'Finished': 3, // Fallback just in case
-        'Expired': 4
+        'Expired': 4,
+        'Cancelled': 5,
       }
 
       data.sort((a, b) => {
@@ -71,6 +72,7 @@ export default function Orders() {
       case 'Paid': return 'var(--success)'
       case 'Completed': return 'var(--text-muted)'
       case 'Expired': return 'var(--danger)'
+      case 'Cancelled': return 'var(--danger)'
       default: return 'var(--text)'
     }
   }
@@ -111,6 +113,21 @@ export default function Orders() {
                     ))
                 }
               </div>
+
+              {order.notes && (
+                <div style={{
+                  marginTop: '0.5rem',
+                  padding: '0.4rem 0.6rem',
+                  background: 'var(--surface-2, #fff3e6)',
+                  borderRadius: '4px',
+                  borderLeft: '3px solid var(--primary, #e4572e)',
+                  fontSize: '0.85rem',
+                  color: 'var(--text)',
+                }}>
+                  <strong>Catatan:</strong> {order.notes}
+                </div>
+              )}
+
               <p style={{ marginTop: '0.5rem', fontWeight: 'bold' }}>{formatRupiah(order.total)}</p>
               {order.paidAt && !order.completedAt && (
                 <p style={{ color: 'var(--success)', fontSize: '0.85rem', marginTop: '0.25rem' }}>
@@ -120,6 +137,11 @@ export default function Orders() {
               {order.completedAt && (
                 <p style={{ color: 'var(--text-muted)', fontSize: '0.85rem', marginTop: '0.25rem' }}>
                   Finished on: {formatTime(order.completedAt)}
+                </p>
+              )}
+              {order.status === 'Cancelled' && (
+                <p style={{ color: 'var(--danger)', fontSize: '0.85rem', marginTop: '0.25rem' }}>
+                  Cancelled {order.closedAt ? `on: ${formatTime(order.closedAt)}` : ''}
                 </p>
               )}
             </div>

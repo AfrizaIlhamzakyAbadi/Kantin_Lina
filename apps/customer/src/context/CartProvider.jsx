@@ -20,7 +20,11 @@ function restore() {
       }
     }
   }
-  return { items, customerName: typeof saved?.customerName === 'string' ? saved.customerName : '' }
+  return {
+    items,
+    customerName: typeof saved?.customerName === 'string' ? saved.customerName : '',
+    orderNotes: typeof saved?.orderNotes === 'string' ? saved.orderNotes : '',
+  }
 }
 
 // The cart only stores a display snapshot (name/price). The server re-reads real
@@ -54,8 +58,12 @@ export default function CartProvider({ children }) {
     setState((prev) => ({ ...prev, customerName }))
   }, [])
 
+  const setOrderNotes = useCallback((orderNotes) => {
+    setState((prev) => ({ ...prev, orderNotes }))
+  }, [])
+
   const clearCart = useCallback(() => {
-    setState((prev) => ({ ...prev, items: {} }))
+    setState((prev) => ({ ...prev, items: {}, orderNotes: '' }))
   }, [])
 
   const value = useMemo(() => {
@@ -63,14 +71,16 @@ export default function CartProvider({ children }) {
     return {
       lines,
       customerName: state.customerName,
+      orderNotes: state.orderNotes,
       totalQty: lines.reduce((sum, l) => sum + l.qty, 0),
       totalPrice: lines.reduce((sum, l) => sum + l.qty * l.price, 0),
       qtyOf: (id) => state.items[id]?.qty ?? 0,
       setQty,
       setCustomerName,
+      setOrderNotes,
       clearCart,
     }
-  }, [state, setQty, setCustomerName, clearCart])
+  }, [state, setQty, setCustomerName, setOrderNotes, clearCart])
 
   return <CartContext.Provider value={value}>{children}</CartContext.Provider>
 }

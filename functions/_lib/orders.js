@@ -19,6 +19,7 @@ export const ORDER_STATUS = {
   EXPIRED: 'Expired',
   COMPLETED: 'Completed',
   FAILED: 'Failed', // checkout could not obtain a QR from Midtrans
+  CANCELLED: 'Cancelled',
 }
 
 const orderPath = (orderId) => `orders/${orderId}`

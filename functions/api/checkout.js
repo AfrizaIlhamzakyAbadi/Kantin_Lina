@@ -39,7 +39,7 @@ class HttpError extends Error {
 }
 
 function parseRequest(payload) {
-  const { customerName, pickupAt, items } = payload ?? {}
+  const { customerName, pickupAt, items, notes } = payload ?? {}
 
   if (typeof customerName !== 'string' || !PICKUP_NAME_PATTERN.test(customerName.trim())) {
     throw new HttpError(400, 'customerName must be a valid string (2-30 characters)')
@@ -75,15 +75,21 @@ function parseRequest(payload) {
     quantities.set(id, qty)
   }
 
+  let orderNotes = ''
+  if (typeof notes === 'string') {
+    orderNotes = notes.trim().slice(0, 200)
+  }
+
   return {
     pickupName: customerName.trim(),
     pickupDate,
     items: [...quantities].map(([id, qty]) => ({ id, qty })),
+    notes: orderNotes,
   }
 }
 
 // Step 2: atomic stock check + deduction + order creation.
-async function reserveStock(env, { orderId, pickupName, pickupDate, items }) {
+async function reserveStock(env, { orderId, pickupName, pickupDate, items, notes }) {
   return runTransaction(env, async (tx) => {
     // We use a counter for today to assign queue numbers (-1, -2, etc)
     // Using Cloudflare Workers standard format YYYY-MM-DD in UTC or simple ISO
@@ -152,12 +158,13 @@ async function reserveStock(env, { orderId, pickupName, pickupDate, items }) {
       pickupAt: pickupDate,
       items: lines.map(({ id, name, price, qty }) => ({ id, name, price, qty })),
       total,
+      notes: notes || '',
       stockDeducted: true, // lets releaseOrder() return the stock exactly once
       createdAt,
       expiresAt,
     })
 
-    return { lines, total, expiresAt, finalPickupName }
+    return { lines, total, expiresAt, finalPickupName, notes: notes || '' }
   })
 }
 
@@ -210,12 +217,12 @@ export async function onRequestPost({ request, env }) {
     } catch {
       throw new HttpError(400, 'Invalid JSON body')
     }
-    const { pickupName, pickupDate, items } = parseRequest(payload)
+    const { pickupName, pickupDate, items, notes } = parseRequest(payload)
 
     // Midtrans order_id: max 50 chars, unique per charge.
     orderId = `KL-${crypto.randomUUID().replaceAll('-', '').slice(0, 12).toUpperCase()}`
 
-    const reservation = await reserveStock(env, { orderId, pickupName, pickupDate, items })
+    const reservation = await reserveStock(env, { orderId, pickupName, pickupDate, items, notes })
     stockReserved = true
 
     const charge = await requestQris(env, { orderId, pickupName: reservation.finalPickupName, ...reservation })
@@ -231,6 +238,7 @@ export async function onRequestPost({ request, env }) {
       status: ORDER_STATUS.PENDING,
       pickupName: reservation.finalPickupName,
       total: reservation.total,
+      notes: reservation.notes,
       expiresAt: reservation.expiresAt.toISOString(),
       transactionStatus: charge.transaction_status,
       qrString: charge.qr_string,
