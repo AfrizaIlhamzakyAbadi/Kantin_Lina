@@ -6,61 +6,42 @@ import useActiveOrder from '../hooks/useActiveOrder.js'
 import useCountdown from '../hooks/useCountdown.js'
 import { clearActiveOrder } from '../lib/storage.js'
 import { formatCountdown, formatPickup, formatRupiah } from '../lib/format.js'
-import { PAYMENT_WINDOW_MS } from '../lib/constants.js'
 
-const RING_RADIUS = 54
-const RING_LENGTH = 2 * Math.PI * RING_RADIUS
-
-function CountdownRing({ remaining }) {
-  const fraction = Math.min(1, remaining / PAYMENT_WINDOW_MS)
+function DigitalCountdown({ remaining }) {
   const urgent = remaining <= 30_000
   return (
-    <div className={urgent ? 'ring urgent' : 'ring'} role="timer" aria-label={`Time left to pay: ${formatCountdown(remaining)}`}>
-      <svg viewBox="0 0 120 120" aria-hidden="true">
-        <circle className="ring-track" cx="60" cy="60" r={RING_RADIUS} />
-        <circle
-          className="ring-progress"
-          cx="60"
-          cy="60"
-          r={RING_RADIUS}
-          strokeDasharray={RING_LENGTH}
-          strokeDashoffset={RING_LENGTH * (1 - fraction)}
-        />
-      </svg>
-      <div className="ring-label">
-        <strong id="countdown-value">{formatCountdown(remaining)}</strong>
-        <span>left to pay</span>
-      </div>
+    <div
+      className={`digital-countdown-box ${urgent ? 'urgent' : ''}`}
+      role="timer"
+      aria-label={`Time left to pay: ${formatCountdown(remaining)}`}
+    >
+      <span aria-hidden="true">{urgent ? '▲' : '■'}</span>
+      <strong id="countdown-value">{formatCountdown(remaining)}</strong>
+      <span>{urgent ? '! HURRY !' : 'REMAINING'}</span>
     </div>
   )
 }
 
-function PickupCard({ pickupName, pickupAt, notes }) {
+function PickupTicket({ pickupName, pickupAt, notes }) {
   return (
-    <div className="pickup-card">
-      <span className="muted">Your pickup name</span>
-      <strong className="pickup-name" id="pickup-name">{pickupName || '—'}</strong>
-      {pickupAt && <span className="muted">Pickup: {formatPickup(pickupAt)}</span>}
-      {notes && (
-        <span
-          className="pickup-note"
-          style={{
-            fontSize: '0.88rem',
-            color: 'var(--text)',
-            background: 'var(--surface)',
-            padding: '4px 10px',
-            borderRadius: '6px',
-            border: '1px solid var(--border)',
-            marginTop: '4px',
-            maxWidth: '100%',
-            wordBreak: 'break-word',
-            textAlign: 'center',
-          }}
-        >
-          📝 <strong>Note:</strong> {notes}
-        </span>
+    <article className="pickup-ticket">
+      <small style={{ fontFamily: 'var(--font-pixel)', fontSize: '0.62rem' }}>
+        *** OFFICIAL CALL TICKET ***
+      </small>
+      <strong className="pickup-ticket-name" id="pickup-name">
+        {pickupName || '—'}
+      </strong>
+      {pickupAt && (
+        <small style={{ fontFamily: 'var(--font-mono)' }}>
+          PICKUP TIME: {formatPickup(pickupAt)}
+        </small>
       )}
-    </div>
+      {notes && (
+        <div className="pickup-ticket-note">
+          <strong>KITCHEN NOTE:</strong> &ldquo;{notes}&rdquo;
+        </div>
+      )}
+    </article>
   )
 }
 
@@ -70,8 +51,6 @@ export default function Payment() {
   const activeOrder = useActiveOrder()
   const mine = activeOrder?.orderId === orderId ? activeOrder : null
 
-  // `order`: undefined = still loading, null = no such document (yet), object = the order.
-  // The id is stored alongside so navigating to another order shows loading again.
   const [loaded, setLoaded] = useState({ id: null, data: undefined })
   const [cancelling, setCancelling] = useState(false)
   const [cancelError, setCancelError] = useState('')
@@ -93,8 +72,6 @@ export default function Payment() {
   const pickupAt = order?.pickupAt ?? mine?.pickupAt ?? null
   const notes = order?.notes ?? mine?.notes ?? ''
 
-  // Deadline: the server's `expiresAt` once it exists, otherwise what was saved
-  // locally at checkout. Absolute timestamps mean a refresh never resets the clock.
   const expiresAt = order?.expiresAt?.toMillis?.() ?? mine?.expiresAt ?? null
   const remaining = useCountdown(expiresAt)
   const timedOut = status === 'pending' && remaining === 0
@@ -107,7 +84,7 @@ export default function Payment() {
   async function handleCancelOrder() {
     if (
       !window.confirm(
-        'Are you sure you want to cancel this order? The QR code will be invalidated and reserved items will be returned to stock.',
+        'Cancel this order? The QR code will be invalidated and reserved items returned to stock.',
       )
     ) {
       return
@@ -137,122 +114,136 @@ export default function Payment() {
     }
   }
 
-  // ---- Loading -------------------------------------------------------------
+  // Loading
   if (order === undefined && !mine) {
     return (
-      <div className="container page narrow">
-        <div className="card panel center" aria-busy="true">Loading your order…</div>
-      </div>
+      <section className="notice-card page-narrow" aria-busy="true">
+        <header className="page-headline">
+          <h1>&gt; LOADING ORDER DATA...</h1>
+        </header>
+        <p>Connecting to database host...</p>
+      </section>
     )
   }
 
-  // ---- Paid ----------------------------------------------------------------
+  // Paid
   if (status === 'paid') {
     return (
-      <div className="container page narrow">
-        <div className="card panel center result result-success">
-          <span className="result-icon" aria-hidden="true">✅</span>
-          <h1>Payment received</h1>
-          <p className="lead">Your order is confirmed. Show this name at the counter.</p>
-          <PickupCard pickupName={pickupName} pickupAt={pickupAt} notes={notes} />
-          {typeof order?.total === 'number' && <p className="muted">Paid {formatRupiah(order.total)}</p>}
-          <button type="button" className="btn btn-ghost" id="payment-new-order" onClick={startNewOrder}>Place another order</button>
-        </div>
-      </div>
+      <section className="result-card page-narrow" aria-labelledby="paid-title">
+        <span className="result-tag success">[ ✓ PAYMENT CONFIRMED ]</span>
+        <h1 id="paid-title">PAYMENT RECEIVED</h1>
+        <p>Your order is locked in. Show this call name at the counter:</p>
+        <PickupTicket pickupName={pickupName} pickupAt={pickupAt} notes={notes} />
+        {typeof order?.total === 'number' && (
+          <p><strong>TOTAL PAID: {formatRupiah(order.total)}</strong></p>
+        )}
+        <button type="button" className="btn btn-primary" id="payment-new-order" onClick={startNewOrder}>
+          &lt;&lt; PLACE ANOTHER ORDER
+        </button>
+      </section>
     )
   }
 
-  // ---- Completed -----------------------------------------------------------
+  // Completed
   if (status === 'completed') {
     return (
-      <div className="container page narrow">
-        <div className="card panel center result">
-          <span className="result-icon" aria-hidden="true">🎉</span>
-          <h1>Order picked up</h1>
-          <p className="lead">Enjoy your meal! Thanks for ordering at Kantin Lina.</p>
-          <button type="button" className="btn btn-primary" id="payment-new-order" onClick={startNewOrder}>Order again</button>
-        </div>
-      </div>
+      <section className="result-card page-narrow" aria-labelledby="completed-title">
+        <span className="result-tag success">[ ★ ORDER FINISHED ]</span>
+        <h1 id="completed-title">MEAL PICKED UP</h1>
+        <p>Enjoy your meal! Thanks for ordering at Kantin Lina.</p>
+        <button type="button" className="btn btn-primary" id="payment-new-order" onClick={startNewOrder}>
+          &lt;&lt; ORDER AGAIN
+        </button>
+      </section>
     )
   }
 
-  // ---- Expired / cancelled / timed out locally -----------------------------
+  // Expired / Cancelled / Timed Out
   if (status === 'expired' || status === 'cancelled' || timedOut) {
     const isCancelled = status === 'cancelled'
     return (
-      <div className="container page narrow">
-        <div className="card panel center result result-danger">
-          <span className="result-icon" aria-hidden="true">{isCancelled ? '🛑' : '⌛'}</span>
-          <h1>{isCancelled ? 'Order cancelled' : 'Payment window closed'}</h1>
-          <p className="lead">
-            {isCancelled
-              ? 'This order has been cancelled. Any reserved items have been returned to stock.'
-              : 'This order was not paid within 3 minutes, so it has expired. Please place a new order.'}
-          </p>
-          {notes && <p className="muted" style={{ fontStyle: 'italic' }}>Note: &ldquo;{notes}&rdquo;</p>}
-          <button type="button" className="btn btn-primary" id="payment-new-order" onClick={startNewOrder}>Start a new order</button>
-        </div>
-      </div>
+      <section className="result-card page-narrow" aria-labelledby="closed-title">
+        <span className="result-tag danger">
+          {isCancelled ? '[ X CANCELLED ]' : '[ ! WINDOW EXPIRED ]'}
+        </span>
+        <h1 id="closed-title">
+          {isCancelled ? 'ORDER CANCELLED' : 'PAYMENT WINDOW CLOSED'}
+        </h1>
+        <p>
+          {isCancelled
+            ? 'This order was cancelled. Reserved items have been returned to stock.'
+            : 'Payment window was exceeded (3 minutes). Please start a fresh order.'}
+        </p>
+        {notes && <p><em>Note: &ldquo;{notes}&rdquo;</em></p>}
+        <button type="button" className="btn btn-primary" id="payment-new-order" onClick={startNewOrder}>
+          &lt;&lt; START NEW ORDER
+        </button>
+      </section>
     )
   }
 
-  // ---- Pending, but this browser doesn't hold the QR ----------------------
+  // QR missing on this device
   if (!mine?.qrUrl) {
     return (
-      <div className="container page narrow">
-        <div className="card panel center result">
-          <span className="result-icon" aria-hidden="true">🔍</span>
-          <h1>{order ? 'Waiting for payment' : 'Order not found'}</h1>
-          <p className="lead">
-            {order
-              ? 'The QR code for this order is not available on this device.'
-              : 'We could not find this order on this device.'}
-          </p>
-          <Link to="/menu" className="btn btn-primary" id="payment-back-menu">Back to menu</Link>
-        </div>
-      </div>
+      <section className="result-card page-narrow" aria-labelledby="missing-title">
+        <span className="result-tag">[ ? ]</span>
+        <h1 id="missing-title">
+          {order ? 'WAITING FOR PAYMENT' : 'ORDER NOT FOUND'}
+        </h1>
+        <p>
+          {order
+            ? 'The QR code was initialized on another browser/device.'
+            : 'Could not find this order ticket on this device.'}
+        </p>
+        <Link to="/menu" className="btn btn-primary" id="payment-back-menu">
+          &lt;&lt; BACK TO MENU
+        </Link>
+      </section>
     )
   }
 
-  // ---- Pending: show the QR and the strict 3 minute countdown --------------
+  // Pending: show clear, scannable QRIS display and digital countdown
   return (
-    <div className="container page narrow">
-      <div className="card panel center pay-card">
-        <h1>Scan to pay</h1>
-        <p className="lead">Open your e-wallet or banking app and scan this QRIS code.</p>
+    <section className="payment-box page-narrow" aria-labelledby="pay-title">
+      <header className="page-headline" style={{ width: '100%' }}>
+        <h1 id="pay-title">&gt; SCAN QRIS TO PAY</h1>
+        <p>Scan with GoPay, OVO, Dana, BCA, or any banking app.</p>
+      </header>
 
-        {remaining !== null && <CountdownRing remaining={remaining} />}
+      {remaining !== null && <DigitalCountdown remaining={remaining} />}
 
-        <div className="qr-frame">
-          <img src={mine.qrUrl} alt="QRIS payment code" width="240" height="240" id="qris-image" />
+      {/* High-contrast, clean scannable QR container */}
+      <figure className="qris-display-frame">
+        <img
+          src={mine.qrUrl}
+          alt="Midtrans QRIS Payment Code"
+          width="240"
+          height="240"
+          id="qris-image"
+        />
+      </figure>
+
+      <PickupTicket pickupName={pickupName} pickupAt={pickupAt} notes={notes} />
+
+      {cancelError && (
+        <div className="notice notice-error" role="alert" style={{ width: '100%' }}>
+          <strong>[ ERROR ]</strong> {cancelError}
         </div>
+      )}
 
-        <PickupCard pickupName={pickupName} pickupAt={pickupAt} notes={notes} />
+      <button
+        type="button"
+        className="btn btn-danger btn-block"
+        id="payment-cancel-order"
+        onClick={handleCancelOrder}
+        disabled={cancelling}
+      >
+        {cancelling ? 'CANCELLING ORDER...' : '[ X CANCEL ORDER & RESTORE STOCK ]'}
+      </button>
 
-        {cancelError && (
-          <div className="notice notice-error" role="alert" style={{ width: '100%' }}>
-            {cancelError}
-          </div>
-        )}
-
-        <div className="pay-actions" style={{ display: 'flex', flexDirection: 'column', gap: '8px', width: '100%', marginTop: '6px' }}>
-          <button
-            type="button"
-            className="btn btn-ghost"
-            style={{ color: 'var(--danger)', borderColor: 'var(--border)' }}
-            id="payment-cancel-order"
-            onClick={handleCancelOrder}
-            disabled={cancelling}
-          >
-            {cancelling ? 'Cancelling order…' : 'Cancel this order'}
-          </button>
-        </div>
-
-        <p className="hint">
-          This page updates automatically once your payment is confirmed. Keep it open or come back with the
-          &ldquo;My order&rdquo; link.
-        </p>
-      </div>
-    </div>
+      <p style={{ fontSize: '0.8rem', color: 'var(--text-muted)' }}>
+        * This page updates automatically once settlement is confirmed. Keep this tab open.
+      </p>
+    </section>
   )
 }

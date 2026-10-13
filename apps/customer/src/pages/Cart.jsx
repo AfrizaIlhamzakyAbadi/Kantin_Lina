@@ -45,24 +45,27 @@ export default function Cart() {
   const slots = useMemo(() => (dayKey ? getSlotsForDate(schedule, dayKey) : []), [schedule, dayKey])
   const timeValue = slots.includes(pickupTime) ? pickupTime : ''
 
-  // A QR that is still within its 3 minute window must be finished (or allowed
-  // to expire or be cancelled) first, otherwise a second checkout would overwrite it.
+  // A QR that is still within its 3 minute window must be finished or cancelled first.
   const activeRemaining = useCountdown(activeOrder?.expiresAt ?? null)
   const paymentInProgress = activeRemaining !== null && activeRemaining > 0
 
   const nameOk = cleanName(customerName).length >= MIN_NAME_LENGTH
   const canSubmit =
-    viewLines.length > 0 && !hasUnavailable && nameOk && Boolean(dayKey) && Boolean(timeValue) &&
-    !paymentInProgress && !submitting
+    viewLines.length > 0 &&
+    !hasUnavailable &&
+    nameOk &&
+    Boolean(dayKey) &&
+    Boolean(timeValue) &&
+    !paymentInProgress &&
+    !submitting
 
   async function handleCheckout(event) {
     event.preventDefault()
     if (!canSubmit) return
     setError('')
 
-    // Re-validate against the current time: the slot list may be minutes old.
     if (!getSlotsForDate(schedule, dayKey).includes(timeValue)) {
-      setError('That pickup time is no longer available. Please choose another one.')
+      setError('Selected pickup time is no longer available. Please select another slot.')
       return
     }
 
@@ -86,7 +89,6 @@ export default function Cart() {
         throw new Error(data?.error || `Checkout failed (HTTP ${response.status}). Please try again.`)
       }
 
-      // Prefer the server's deadline; fall back to now + 3 minutes.
       setActiveOrder({
         orderId: data.orderId,
         pickupName: data.pickupName || pickupName,
@@ -107,159 +109,218 @@ export default function Cart() {
 
   if (lines.length === 0) {
     return (
-      <div className="container page">
-        <div className="empty">
-          <span aria-hidden="true">🛒</span>
-          <h1>Your cart is empty</h1>
-          <p>Add something tasty from the menu to get started.</p>
-          <Link to="/menu" className="btn btn-primary" id="cart-go-menu">Browse the menu</Link>
-        </div>
-      </div>
+      <section className="notice-card" aria-labelledby="empty-cart-title">
+        <header className="page-headline">
+          <h1 id="empty-cart-title">&gt; YOUR CART IS EMPTY</h1>
+        </header>
+        <p style={{ margin: '14px 0' }}>No items in your order tray yet.</p>
+        <Link to="/menu" className="btn btn-primary" id="cart-go-menu">
+          &lt;&lt; BROWSE MENU
+        </Link>
+      </section>
     )
   }
 
   return (
-    <div className="container page">
-      <header className="page-head">
-        <h1>Your cart</h1>
+    <section aria-labelledby="cart-heading">
+      <header className="page-headline">
+        <h1 id="cart-heading">&gt; CART &amp; CHECKOUT</h1>
+        <p>Review items, set pickup details, and initiate QRIS payment.</p>
       </header>
 
       <form className="cart-layout" onSubmit={handleCheckout} noValidate>
-        <section className="card panel" aria-labelledby="cart-items-title">
-          <h2 id="cart-items-title">Items</h2>
-          <ul className="cart-lines">
+        {/* Left column: Cart Items List */}
+        <section aria-labelledby="cart-items-heading">
+          <header className="menu-category-header">
+            <h2 id="cart-items-heading">// SELECTED ITEMS</h2>
+            <span>[{viewLines.length} LINES]</span>
+          </header>
+
+          <ul className="cart-item-list">
             {viewLines.map((line) => (
-              <li key={line.id} className={line.unavailable ? 'cart-line unavailable' : 'cart-line'}>
-                <div className="cart-line-info">
+              <li key={line.id} className="cart-item-row">
+                <div className="cart-item-info">
                   <strong>{line.name}</strong>
-                  <span className="muted">{formatRupiah(line.price)}</span>
-                  {line.unavailable && <span className="line-warning">No longer available. Please remove it.</span>}
+                  <span className="cart-item-price">@{formatRupiah(line.price)}</span>
+                  {line.unavailable && (
+                    <p style={{ color: 'var(--accent-red)', fontWeight: 'bold', fontSize: '0.8rem' }}>
+                      [ ITEM SOLD OUT - REMOVE TO CONTINUE ]
+                    </p>
+                  )}
                 </div>
-                <div className="stepper" role="group" aria-label={`Quantity of ${line.name}`}>
-                  <button type="button" id={`cart-dec-${line.id}`} aria-label={`Remove one ${line.name}`} onClick={() => setQty(line, line.qty - 1)}>−</button>
-                  <output>{line.qty}</output>
-                  <button type="button" id={`cart-inc-${line.id}`} aria-label={`Add one ${line.name}`} disabled={line.qty >= MAX_QTY_PER_ITEM} onClick={() => setQty(line, line.qty + 1)}>+</button>
+
+                <div className="cart-item-controls">
+                  <div className="stepper-block" role="group" aria-label={`Quantity of ${line.name}`}>
+                    <button
+                      type="button"
+                      id={`cart-dec-${line.id}`}
+                      aria-label={`Remove one ${line.name}`}
+                      onClick={() => setQty(line, line.qty - 1)}
+                    >
+                      -
+                    </button>
+                    <output aria-live="polite">{line.qty}</output>
+                    <button
+                      type="button"
+                      id={`cart-inc-${line.id}`}
+                      aria-label={`Add one ${line.name}`}
+                      disabled={line.qty >= MAX_QTY_PER_ITEM}
+                      onClick={() => setQty(line, line.qty + 1)}
+                    >
+                      +
+                    </button>
+                  </div>
+                  <span className="cart-item-total">{formatRupiah(line.qty * line.price)}</span>
                 </div>
-                <span className="line-total">{formatRupiah(line.qty * line.price)}</span>
               </li>
             ))}
           </ul>
         </section>
 
-        <aside className="card panel checkout-panel" aria-labelledby="checkout-title">
-          <h2 id="checkout-title">Pickup details</h2>
+        {/* Right column: Pickup Details & Checkout Sidebar */}
+        <aside aria-labelledby="checkout-aside-heading">
+          <header className="menu-category-header">
+            <h2 id="checkout-aside-heading">// PICKUP DETAILS</h2>
+          </header>
 
-          <label className="field" htmlFor="customer-name">
-            <span>Your name</span>
-            <input
-              id="customer-name"
-              type="text"
-              autoComplete="given-name"
-              placeholder="e.g. Budi"
-              maxLength={MAX_NAME_LENGTH}
-              value={customerName}
-              onChange={(e) => setCustomerName(e.target.value)}
-            />
-            <small>
-              We add a daily queue number so staff can call a unique name
-              {nameOk && <> (e.g. <strong>{cleanName(customerName)}-1</strong>)</>}.
+          <fieldset className="brutalist-fieldset">
+            <legend>1. CUSTOMER IDENTITY</legend>
+            <label className="field" htmlFor="customer-name">
+              <span>CALL NAME (REQUIRED):</span>
+              <input
+                id="customer-name"
+                type="text"
+                autoComplete="given-name"
+                placeholder="e.g. Budi"
+                maxLength={MAX_NAME_LENGTH}
+                value={customerName}
+                onChange={(e) => setCustomerName(e.target.value)}
+              />
+              <small>
+                A daily queue number will be added (e.g.{' '}
+                <strong>{cleanName(customerName) || 'Budi'}-1</strong>).
+              </small>
+            </label>
+
+            <label className="field" htmlFor="order-notes">
+              <span>NOTES FOR KITCHEN (OPTIONAL):</span>
+              <textarea
+                id="order-notes"
+                rows="2"
+                maxLength={200}
+                placeholder="e.g. Sambal dipisah, tanpa es, tidak pedas..."
+                value={orderNotes || ''}
+                onChange={(e) => setOrderNotes(e.target.value)}
+              />
+              <small>Special food preparation instructions (max 200 chars).</small>
+            </label>
+          </fieldset>
+
+          <fieldset className="brutalist-fieldset">
+            <legend>2. PICKUP SLOT</legend>
+            {days.length === 0 ? (
+              <div className="notice notice-warn" role="status">
+                Pickup unavailable in next few days. Hours: {formatScheduleDays(schedule)},{' '}
+                {schedule.openTime}-{schedule.closeTime}.
+              </div>
+            ) : (
+              <div className="field-row">
+                <label className="field" htmlFor="pickup-day">
+                  <span>DAY:</span>
+                  <select id="pickup-day" value={dayKey} onChange={(e) => setPickupDay(e.target.value)}>
+                    {days.map((d) => (
+                      <option key={d.key} value={d.key}>{d.label}</option>
+                    ))}
+                  </select>
+                </label>
+
+                <label className="field" htmlFor="pickup-time">
+                  <span>TIME:</span>
+                  <select id="pickup-time" value={timeValue} onChange={(e) => setPickupTime(e.target.value)}>
+                    <option value="" disabled>Select time</option>
+                    {slots.map((slot) => (
+                      <option key={slot} value={slot}>{slot}</option>
+                    ))}
+                  </select>
+                </label>
+              </div>
+            )}
+            <small style={{ display: 'block', marginTop: '6px', color: 'var(--text-muted)' }}>
+              Operating hours: {formatScheduleDays(schedule)}, {schedule.openTime}-{schedule.closeTime}
+              {usingDefault && ' (default schedule)'}
             </small>
-          </label>
+          </fieldset>
 
-          <label className="field" htmlFor="order-notes">
-            <span>Message / Notes (optional)</span>
-            <textarea
-              id="order-notes"
-              rows="2"
-              maxLength={200}
-              placeholder="e.g. Sambal dipisah, jangan pakai es, tidak terlalu pedas..."
-              value={orderNotes || ''}
-              onChange={(e) => setOrderNotes(e.target.value)}
-            />
-            <small>Special requests for the kitchen (max 200 chars).</small>
-          </label>
-
-          {days.length === 0 ? (
-            <div className="notice notice-warn" role="status">
-              Pickup is not available in the next few days. Hours: {formatScheduleDays(schedule)},{' '}
-              {schedule.openTime}-{schedule.closeTime}.
+          <div className="order-summary-box">
+            <div className="order-summary-row">
+              <span>ITEMS SUBTOTAL:</span>
+              <span>{formatRupiah(total)}</span>
             </div>
-          ) : (
-            <div className="field-row">
-              <label className="field" htmlFor="pickup-day">
-                <span>Pickup day</span>
-                <select id="pickup-day" value={dayKey} onChange={(e) => setPickupDay(e.target.value)}>
-                  {days.map((d) => (
-                    <option key={d.key} value={d.key}>{d.label}</option>
-                  ))}
-                </select>
-              </label>
-              <label className="field" htmlFor="pickup-time">
-                <span>Pickup time</span>
-                <select id="pickup-time" value={timeValue} onChange={(e) => setPickupTime(e.target.value)}>
-                  <option value="" disabled>Select time</option>
-                  {slots.map((slot) => (
-                    <option key={slot} value={slot}>{slot}</option>
-                  ))}
-                </select>
-              </label>
+            <div className="order-summary-row total-row">
+              <span>TOTAL DUE:</span>
+              <span>{formatRupiah(total)}</span>
             </div>
-          )}
-          <p className="hint">
-            Hours: {formatScheduleDays(schedule)}, {schedule.openTime}-{schedule.closeTime}
-            {usingDefault && ' (default schedule)'}
-          </p>
-
-          <div className="summary">
-            <div className="summary-row"><span>Total</span><strong className="summary-total">{formatRupiah(total)}</strong></div>
           </div>
 
           {paymentInProgress && (
-            <div className="notice notice-warn" role="status" style={{ display: 'flex', flexDirection: 'column', gap: '8px' }}>
-              <div>
-                You have an unpaid order pending.{' '}
-                <Link to={`/payment/${activeOrder.orderId}`}><strong>Go to QR code</strong></Link>.
-              </div>
-              <div>
-                <button
-                  type="button"
-                  className="btn btn-ghost btn-sm"
-                  style={{ color: 'var(--danger)', borderColor: 'var(--border)', padding: '5px 12px', fontSize: '0.85rem' }}
-                  disabled={cancellingPending}
-                  onClick={async () => {
-                    if (window.confirm('Cancel your pending order so you can checkout now? Reserved stock will be restored.')) {
-                      setCancellingPending(true)
-                      try {
-                        await fetch('/api/cancel', {
-                          method: 'POST',
-                          headers: { 'Content-Type': 'application/json' },
-                          body: JSON.stringify({ orderId: activeOrder.orderId }),
-                        })
-                      } catch (e) {
-                        console.error(e)
-                      } finally {
-                        clearActiveOrder()
-                        setCancellingPending(false)
-                      }
+            <div className="notice notice-warn" role="status">
+              <p><strong>[ ALERT ]</strong> You currently have an unpaid order pending.</p>
+              <p style={{ marginTop: '6px' }}>
+                <Link to={`/payment/${activeOrder.orderId}`}>&gt;&gt; Return to QR Code</Link>
+              </p>
+              <button
+                type="button"
+                className="btn btn-danger btn-sm"
+                style={{ marginTop: '8px' }}
+                disabled={cancellingPending}
+                onClick={async () => {
+                  if (window.confirm('Cancel your pending order so you can checkout now? Reserved stock will be restored.')) {
+                    setCancellingPending(true)
+                    try {
+                      await fetch('/api/cancel', {
+                        method: 'POST',
+                        headers: { 'Content-Type': 'application/json' },
+                        body: JSON.stringify({ orderId: activeOrder.orderId }),
+                      })
+                    } catch (e) {
+                      console.error(e)
+                    } finally {
+                      clearActiveOrder()
+                      setCancellingPending(false)
                     }
-                  }}
-                >
-                  {cancellingPending ? 'Cancelling pending order…' : 'Cancel pending order'}
-                </button>
-              </div>
+                  }
+                }}
+              >
+                {cancellingPending ? 'CANCELLING...' : '[ CANCEL PENDING ORDER ]'}
+              </button>
             </div>
           )}
-          {hasUnavailable && (
-            <div className="notice notice-warn" role="status">Remove unavailable items to continue.</div>
-          )}
-          {error && <div className="notice notice-error" role="alert">{error}</div>}
 
-          <button type="submit" className="btn btn-primary btn-lg btn-block" id="checkout-submit" disabled={!canSubmit}>
-            {submitting ? 'Creating your QR code…' : 'Pay with QRIS'}
+          {hasUnavailable && (
+            <div className="notice notice-error" role="status">
+              Please remove sold-out items to proceed with checkout.
+            </div>
+          )}
+
+          {error && (
+            <div className="notice notice-error" role="alert">
+              <strong>[ ERROR ]</strong> {error}
+            </div>
+          )}
+
+          <button
+            type="submit"
+            className="btn btn-primary btn-lg btn-block"
+            id="checkout-submit"
+            disabled={!canSubmit}
+          >
+            {submitting ? 'GENERATING QRIS...' : '=== PAY WITH QRIS ==='}
           </button>
-          <p className="hint center">You will have 3 minutes to scan and pay.</p>
+          <small style={{ display: 'block', textAlign: 'center', marginTop: '6px', color: 'var(--text-muted)' }}>
+            * You will have exactly 3 minutes to scan and pay.
+          </small>
         </aside>
       </form>
-    </div>
+    </section>
   )
 }

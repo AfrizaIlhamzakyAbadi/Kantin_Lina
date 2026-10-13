@@ -2,13 +2,14 @@ import { Link } from 'react-router-dom'
 
 export default function NotFound() {
   return (
-    <div className="container page">
-      <div className="empty">
-        <span aria-hidden="true">🧭</span>
-        <h1>404 - Page not found</h1>
-        <p>The page you are looking for does not exist.</p>
-        <Link to="/" className="btn btn-primary" id="notfound-home">Back to home</Link>
-      </div>
-    </div>
+    <section className="notice-card page-narrow" aria-labelledby="notfound-title">
+      <header className="page-headline">
+        <h1 id="notfound-title">&gt; HTTP 404: FILE NOT FOUND</h1>
+      </header>
+      <p style={{ margin: '14px 0' }}>The requested document URL was not found on this server.</p>
+      <Link to="/" className="btn btn-primary" id="notfound-home">
+        &lt;&lt; RETURN TO HOME
+      </Link>
+    </section>
   )
 }

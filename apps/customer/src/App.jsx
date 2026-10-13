@@ -9,9 +9,9 @@ import NotFound from './pages/NotFound.jsx'
 
 export default function App() {
   return (
-    <>
+    <div className="site-wrapper">
       <Header />
-      <main>
+      <main className="site-content" role="main">
         <Routes>
           <Route path="/" element={<Home />} />
           <Route path="/menu" element={<Menu />} />
@@ -20,6 +20,15 @@ export default function App() {
           <Route path="*" element={<NotFound />} />
         </Routes>
       </main>
-    </>
+      <footer className="blog-footer" role="contentinfo">
+        <p><strong>KANTIN LINA // ONLINE ORDER PORTAL</strong></p>
+        <p className="footer-meta">
+          [SMA NEGERI 7 YOGYAKARTA] &bull; POWERED BY MIDTRANS QRIS &bull; BEST VIEWED AT ANY RESOLUTION
+        </p>
+        <p className="footer-meta">
+          &copy; 2026 KANTIN LINA. ALL RIGHTS RESERVED.
+        </p>
+      </footer>
+    </div>
   )
 }
