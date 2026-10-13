@@ -131,7 +131,7 @@ export default function Cart() {
       <form className="cart-layout" onSubmit={handleCheckout} noValidate>
         {/* Left column: Cart Items List */}
         <section aria-labelledby="cart-items-heading">
-          <header className="menu-category-header">
+          <header className="menu-category-header cat-cart">
             <h2 id="cart-items-heading">// SELECTED ITEMS</h2>
             <span>[{viewLines.length} LINES]</span>
           </header>
@@ -179,7 +179,7 @@ export default function Cart() {
 
         {/* Right column: Pickup Details & Checkout Sidebar */}
         <aside aria-labelledby="checkout-aside-heading">
-          <header className="menu-category-header">
+          <header className="menu-category-header cat-cart">
             <h2 id="checkout-aside-heading">// PICKUP DETAILS</h2>
           </header>
 

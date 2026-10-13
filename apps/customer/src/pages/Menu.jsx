@@ -118,7 +118,7 @@ export default function Menu() {
             if (catItems.length === 0) return null
             return (
               <section key={category} className="menu-category-block" aria-labelledby={`cat-${category}`}>
-                <header className="menu-category-header">
+                <header className={`menu-category-header cat-${category.toLowerCase()}`}>
                   <h2 id={`cat-${category}`}>// {category.toUpperCase()}</h2>
                   <span>[{catItems.length} ITEMS]</span>
                 </header>

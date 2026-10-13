@@ -23,7 +23,7 @@ export default function App() {
       <footer className="blog-footer" role="contentinfo">
         <p><strong>KANTIN LINA // ONLINE ORDER PORTAL</strong></p>
         <p className="footer-meta">
-          [SMA NEGERI 7 YOGYAKARTA] &bull; POWERED BY MIDTRANS QRIS &bull; BEST VIEWED AT ANY RESOLUTION
+          POWERED BY MIDTRANS QRIS &bull; BEST VIEWED AT ANY RESOLUTION
         </p>
         <p className="footer-meta">
           &copy; 2026 KANTIN LINA. ALL RIGHTS RESERVED.

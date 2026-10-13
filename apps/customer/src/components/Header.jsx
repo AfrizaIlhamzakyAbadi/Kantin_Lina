@@ -27,7 +27,7 @@ export default function Header() {
       </div>
 
       <div className="header-subtitle-bar" aria-label="System bulletin">
-        <span>&gt; SMA NEGERI 7 YOGYAKARTA // PRE-ORDER</span>
+        <span>&gt; KANTIN LINA // ONLINE PRE-ORDER PORTAL</span>
         <span>VER. 1.0 (QRIS)</span>
       </div>
 

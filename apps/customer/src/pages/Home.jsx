@@ -62,18 +62,18 @@ export default function Home() {
 
       {/* 3 Step System Protocol */}
       <section aria-labelledby="protocol-title" style={{ marginTop: '24px' }}>
-        <header className="menu-category-header">
+        <header className="menu-category-header cat-protocol">
           <h2 id="protocol-title">// SYSTEM PROTOCOL (3 EASY STEPS)</h2>
         </header>
 
         <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(220px, 1fr))', gap: '14px' }}>
           {STEPS.map((step) => (
             <article key={step.num} className="menu-entry" style={{ padding: '14px' }}>
-              <span style={{ fontFamily: 'var(--font-pixel)', fontSize: '0.85rem', background: '#000', color: '#fff', padding: '2px 6px', display: 'inline-block', width: 'fit-content', marginBottom: '8px' }}>
+              <span className="step-badge">
                 STEP {step.num}
               </span>
               <h3 style={{ marginBottom: '6px' }}>{step.title}</h3>
-              <p style={{ fontSize: '0.85rem' }}>{step.text}</p>
+              <p style={{ fontSize: '0.95rem' }}>{step.text}</p>
             </article>
           ))}
         </div>
@@ -81,7 +81,7 @@ export default function Home() {
 
       {/* Terms & Conditions Section */}
       <section aria-labelledby="terms-title" style={{ marginTop: '32px' }}>
-        <header className="menu-category-header">
+        <header className="menu-category-header cat-terms">
           <h2 id="terms-title">// TERMS &amp; CONDITIONS</h2>
           <span>[14 ARTICLES]</span>
         </header>
@@ -99,7 +99,7 @@ export default function Home() {
               <strong>3. MODIFICATIONS:</strong> Kantin Lina reserves the right to adjust menu prices, operating schedules, or available quantities.
             </div>
             <div>
-              <strong>4. COPYRIGHTS:</strong> All content, naming, and menu items belong to Kantin Lina (SMA Negeri 7 Yogyakarta).
+              <strong>4. COPYRIGHTS:</strong> All content, naming, and menu items belong to Kantin Lina.
             </div>
             <div>
               <strong>5. ORDER IDENTIFIER:</strong> No user account or registration is required. You provide a recognizable call name used for the counter queue.
