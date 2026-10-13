@@ -40,8 +40,8 @@
   --amber-light: #fef3c7;
   --red: #ef4444;
   --red-light: #fee2e2;
-  --yellow: #facc15;
-  --yellow-hover: #fde047;
+  --yellow: #ffe600;
+  --yellow-hover: #ffea2e;
 
   /* Borders: Thick, crisp, solid black */
   --border-thick: 2.5px solid #000000;
@@ -51,6 +51,17 @@
   /* Hard pixel drop shadows */
   --shadow-pixel: 3px 3px 0 #000000;
   --shadow-pixel-lg: 4px 4px 0 #000000;
+}
+
+figure {
+  margin: 0 !important;
+  padding: 0 !important;
+  box-sizing: border-box !important;
+}
+
+a.btn,
+a.btn:visited {
+  text-decoration: none !important;
 }
 
 *,
