@@ -1,6 +1,6 @@
 /* ==========================================================================
    Kantin Lina // Hybrid Pixel Art + Early 2000s Web 1.0 Aesthetic
-   High-Contrast, Vibrant Color Palette & Maximum Monospace Readability
+   High-Contrast, Diverse Color Palette & Maximum Monospace Readability
    ========================================================================== */
 
 :root {
@@ -9,10 +9,10 @@
   --font-body: 'Cascadia Code', 'Fira Code', 'JetBrains Mono', Consolas, 'Source Code Pro', 'Courier New', monospace;
   --font-mono: 'Cascadia Code', Consolas, 'Courier New', monospace;
 
-  /* Palette: Warm retro tone for body, vibrant colors for objects */
+  /* Palette: Crisp retro backgrounds and diverse high-contrast object colors */
   --bg: #ece9d8;
-  --surface: #fffdf0;
-  --surface-alt: #fef9c3;
+  --surface: #ffffff;
+  --surface-alt: #f1f5f9;
   --border: #000000;
 
   /* Text: Solid deep black for maximum contrast */
@@ -23,19 +23,25 @@
   --link: #0000ee;
   --link-visited: #551a8b;
 
-  /* Eye-popping Retro High-Contrast Colors */
-  --yellow: #ffe600;
-  --yellow-hover: #ffea2e;
-  --orange: #ff5722;
-  --orange-light: #fed7aa;
-  --cyan: #00d2ff;
-  --cyan-light: #cffafe;
-  --green: #00e676;
-  --green-light: #d1fae5;
-  --red: #ff1744;
-  --red-light: #fee2e2;
+  /* Diverse, Balanced High-Contrast Retro Colors (not dominated by yellow) */
   --blue: #2563eb;
-  --purple: #9333ea;
+  --blue-dark: #1d4ed8;
+  --blue-light: #dbeafe;
+  --cyan: #00b4d8;
+  --cyan-light: #cffafe;
+  --orange: #f97316;
+  --orange-light: #fed7aa;
+  --green: #10b981;
+  --green-light: #d1fae5;
+  --purple: #8b5cf6;
+  --purple-light: #ede9fe;
+  --coral: #ff5722;
+  --amber: #f59e0b;
+  --amber-light: #fef3c7;
+  --red: #ef4444;
+  --red-light: #fee2e2;
+  --yellow: #facc15;
+  --yellow-hover: #fde047;
 
   /* Borders: Thick, crisp, solid black */
   --border-thick: 2.5px solid #000000;
@@ -73,14 +79,15 @@ html {
   font-weight: 500;
   line-height: 1.55;
   letter-spacing: -0.01em;
-  overflow-x: hidden;
+  /* overflow-x: clip ensures horizontal containment without breaking CSS sticky */
+  overflow-x: clip;
   -webkit-font-smoothing: antialiased;
 }
 
 /* Remove background idea on mobile phone screen to maximize space utility */
 @media (max-width: 640px) {
   html, body {
-    background-color: #fffdf0 !important;
+    background-color: #ffffff !important;
     background-image: none !important;
   }
 }
@@ -89,7 +96,7 @@ body {
   margin: 0;
   padding: 0;
   min-height: 100vh;
-  overflow-x: hidden;
+  overflow-x: clip;
   display: flex;
   flex-direction: column;
 }
@@ -161,7 +168,7 @@ a:visited {
 }
 
 a:hover {
-  background-color: var(--yellow);
+  background-color: var(--cyan-light);
   color: #000000;
   text-decoration: none;
 }

@@ -1,7 +1,7 @@
 /* ==========================================================================
    Kantin Lina // Web 1.0 + Pixel Art Styling
-   Vibrant Colors, High Contrast, Centered Black Boxes & Strict Square QRIS
-   Responsive Edge-Aligned Shadow & Dense Brutalist Information Layout
+   Diverse High-Contrast Palette, Centered Menu Images, Sticky Cart Top Bar
+   Gap-Protected Right Shadows & Strict Responsive Containment
    ========================================================================== */
 
 /* ---------- Main Blog Frame Container ---------- */
@@ -11,12 +11,12 @@
   margin: 16px auto 32px;
   border: 3px solid #000000;
   background: var(--surface);
-  box-shadow: 5px 5px 0 #000000;
+  box-shadow: 4px 4px 0 #000000;
   display: flex;
   flex-direction: column;
 }
 
-/* Mobile Phone: Remove background idea and shadow completely to maximise space utility */
+/* Mobile Phone: Full width, no outer margins or shadows to maximize screen space */
 @media (max-width: 640px) {
   .site-wrapper {
     margin: 0 !important;
@@ -31,7 +31,7 @@
 }
 
 .site-content {
-  padding: 14px 16px;
+  padding: 14px 18px 24px 14px;
   display: flex;
   flex-direction: column;
   gap: 14px;
@@ -39,7 +39,7 @@
 
 @media (max-width: 640px) {
   .site-content {
-    padding: 10px 10px 20px !important;
+    padding: 10px 14px 20px 10px !important;
     gap: 12px !important;
   }
 }
@@ -50,10 +50,10 @@
   width: 100%;
 }
 
-/* ---------- Header & Navigation ---------- */
+/* ---------- Header & Navigation (Diverse Royal Blue, Not Yellow) ---------- */
 .blog-header {
   border-bottom: 3px solid #000000;
-  background: var(--yellow);
+  background: #2563eb; /* High-contrast Royal Blue */
   display: flex;
   flex-direction: column;
 }
@@ -81,7 +81,7 @@
   align-items: center;
   gap: 10px;
   text-decoration: none;
-  color: var(--text);
+  color: #ffffff;
 }
 
 .brand-title:hover {
@@ -96,7 +96,7 @@
 .brand-name {
   font-family: var(--font-pixel);
   font-size: 1.15rem;
-  color: #000000;
+  color: #ffffff;
   text-transform: uppercase;
   letter-spacing: -0.01em;
 }
@@ -189,20 +189,20 @@
 }
 
 .nav-link:hover {
-  background: var(--yellow);
+  background: #dbeafe;
   color: #000000;
   text-decoration: none;
 }
 
 .nav-link.active {
-  background: var(--blue);
+  background: #1d4ed8;
   color: #ffffff;
 }
 
 .nav-badge {
-  background: var(--yellow);
-  color: #000000;
-  border: 2px solid #000000;
+  background: #ff5722;
+  color: #ffffff;
+  border: 1.5px solid #000000;
   padding: 1px 5px;
   font-size: 0.65rem;
   font-weight: bold;
@@ -219,7 +219,7 @@
   font-family: var(--font-pixel);
   font-size: 0.74rem;
   padding: 8px 14px;
-  border: 2.5px solid #000000;
+  border: 2px solid #000000;
   background: #f1f5f9;
   color: #000000;
   box-shadow: 2px 2px 0 #000000;
@@ -234,7 +234,7 @@
 }
 
 .btn:hover:not(:disabled) {
-  background: var(--yellow);
+  background: #dbeafe;
   color: #000000;
   text-decoration: none;
 }
@@ -252,13 +252,13 @@
 }
 
 .btn-primary {
-  background: #00e676; /* High-contrast vivid green */
-  color: #000000;
+  background: #2563eb;
+  color: #ffffff;
   font-weight: bold;
 }
 
 .btn-primary:hover:not(:disabled) {
-  background: #00ff88;
+  background: #1d4ed8;
 }
 
 .btn-ghost {
@@ -290,19 +290,21 @@
 .btn-lg {
   font-size: 0.85rem;
   padding: 10px 18px;
-  box-shadow: 3px 3px 0 #000000;
+  box-shadow: 2.5px 2.5px 0 #000000;
 }
 
 .btn-lg:active:not(:disabled) {
-  transform: translate(3px, 3px);
+  transform: translate(2px, 2px);
   box-shadow: none;
 }
 
 .btn-block {
-  width: 100%;
+  width: calc(100% - 6px);
+  max-width: calc(100% - 6px);
+  margin-right: auto;
 }
 
-/* ---------- Brutalist Forms & Inputs (Thick, High-Contrast) ---------- */
+/* ---------- Brutalist Forms & Inputs (Diverse Colored Fields) ---------- */
 .field {
   display: flex;
   flex-direction: column;
@@ -360,17 +362,20 @@
   }
 }
 
+/* Shortened width so right shadow leaves a gap and never touches screen edge */
 .brutalist-fieldset {
   border: 2.5px solid #000000;
   padding: 10px 12px;
   margin: 0 0 12px 0;
-  background: #fef3c7; /* Rich Amber */
+  background: #fef3c7; /* Warm Amber */
   box-shadow: 2px 2px 0 #000000;
-  width: 100%;
+  width: calc(100% - 6px);
+  max-width: calc(100% - 6px);
+  margin-right: auto;
 }
 
 .brutalist-fieldset.fieldset-identity {
-  background: #fef9c3; /* Sunny Pastel Yellow */
+  background: #ede9fe; /* Soft Lavender */
 }
 
 .brutalist-fieldset.fieldset-pickup {
@@ -381,20 +386,27 @@
   font-family: var(--font-pixel);
   font-size: 0.72rem;
   padding: 3px 8px;
-  background: var(--yellow);
-  color: #000000;
+  background: #0284c7;
+  color: #ffffff;
   border: 2px solid #000000;
   font-weight: bold;
 }
 
-/* ---------- Section Title & Headers ---------- */
+.fieldset-identity legend {
+  background: #7c3aed;
+  color: #ffffff;
+}
+
+/* ---------- Section Title & Headers (Soft Ice Blue, Not Yellow) ---------- */
 .page-headline {
   border: 2.5px solid #000000;
-  background: #ffe600; /* Rich Sunny Yellow */
+  background: #e0f2fe; /* High-contrast Soft Ice Blue */
   padding: 10px 12px;
   margin-bottom: 12px;
   box-shadow: 2.5px 2.5px 0 #000000;
-  width: 100%;
+  width: calc(100% - 6px);
+  max-width: calc(100% - 6px);
+  margin-right: auto;
 }
 
 .page-headline h1 {
@@ -409,14 +421,15 @@
   line-height: 1.5;
 }
 
-/* ---------- Active Cart Bar at TOP of Menu Page (NOT on Bottom) ---------- */
+/* ---------- Sticky Cart Overview at TOP of Menu Section ---------- */
+/* Appears if and only if a menu is picked; sticks to top so it's always visible while scrolling */
 .cart-top-bar {
   position: sticky;
-  top: 0px;
-  z-index: 40;
+  top: 8px;
+  z-index: 100;
   border: 2.5px solid #000000;
-  background: #ffe600;
-  color: #000000;
+  background: #ff5722; /* Vivid High-Contrast Coral Orange */
+  color: #ffffff;
   box-shadow: 3px 3px 0 #000000;
   padding: 8px 12px;
   display: flex;
@@ -425,7 +438,9 @@
   flex-wrap: wrap;
   gap: 8px;
   margin-bottom: 12px;
-  width: 100%;
+  width: calc(100% - 6px);
+  max-width: calc(100% - 6px);
+  margin-right: auto;
 }
 
 .cart-top-info {
@@ -439,13 +454,28 @@
 
 .cart-top-title {
   font-weight: bold;
+  color: #ffffff;
 }
 
 .cart-top-subtotal {
   background: #ffffff;
+  color: #000000;
   border: 1.5px solid #000000;
   padding: 2px 6px;
   font-size: 0.7rem;
+}
+
+.btn-cart-review {
+  background: #fde047;
+  color: #000000;
+  font-weight: bold;
+  border: 2px solid #000000;
+  box-shadow: 2px 2px 0 #000000;
+}
+
+.btn-cart-review:hover {
+  background: #ffffff;
+  color: #000000;
 }
 
 @media (max-width: 480px) {
@@ -459,13 +489,13 @@
   }
 }
 
-/* ---------- Menu Item List & Categories (Colorful, Dense) ---------- */
+/* ---------- Menu Item List & Diverse Categories ---------- */
 .menu-category-block {
   margin-bottom: 16px;
   width: 100%;
 }
 
-/* Colorful, vibrant category headers */
+/* Category headers: shortened width to leave small gap from right edge */
 .menu-category-header {
   padding: 8px 12px;
   font-family: var(--font-pixel);
@@ -478,46 +508,47 @@
   justify-content: space-between;
   flex-wrap: wrap;
   gap: 4px;
-  background: var(--yellow);
   color: #000000;
-  width: 100%;
+  width: calc(100% - 6px);
+  max-width: calc(100% - 6px);
+  margin-right: auto;
 }
 
 .menu-category-header.cat-food {
-  background: var(--orange);
-  color: #000000;
+  background: #ea580c; /* Deep Orange */
+  color: #ffffff;
 }
 
 .menu-category-header.cat-drink {
-  background: var(--cyan);
-  color: #000000;
+  background: #0284c7; /* Vivid Cyber Cyan */
+  color: #ffffff;
 }
 
 .menu-category-header.cat-other {
-  background: var(--green);
-  color: #000000;
+  background: #059669; /* Emerald Green */
+  color: #ffffff;
 }
 
 .menu-category-header.cat-cart {
-  background: var(--yellow);
-  color: #000000;
+  background: #7c3aed; /* Violet Purple */
+  color: #ffffff;
 }
 
 .menu-category-header.cat-protocol {
-  background: #38bdf8;
-  color: #000000;
+  background: #2563eb; /* Royal Blue */
+  color: #ffffff;
 }
 
 .menu-category-header.cat-terms {
-  background: #fde047;
-  color: #000000;
+  background: #d97706; /* Warm Amber */
+  color: #ffffff;
 }
 
 .step-badge {
   font-family: var(--font-pixel);
   font-size: 0.74rem;
-  background: var(--yellow);
-  color: #000000;
+  background: #2563eb;
+  color: #ffffff;
   border: 2px solid #000000;
   box-shadow: 2px 2px 0 #000000;
   padding: 2px 6px;
@@ -526,6 +557,14 @@
   margin-bottom: 6px;
   font-weight: bold;
   white-space: nowrap !important;
+}
+
+.step-card-02 .step-badge {
+  background: #ea580c;
+}
+
+.step-card-03 .step-badge {
+  background: #059669;
 }
 
 .menu-category-header h2 {
@@ -551,14 +590,16 @@
   }
 }
 
-/* Colorful High-Contrast Menu Cards */
+/* Diverse High-Contrast Menu Cards */
 .menu-entry {
   border: 2.5px solid #000000;
   background: #ffffff;
   box-shadow: 2.5px 2.5px 0 #000000;
   display: flex;
   flex-direction: column;
-  width: 100%;
+  width: calc(100% - 4px);
+  max-width: calc(100% - 4px);
+  margin-right: auto;
 }
 
 .menu-entry.cat-food {
@@ -574,15 +615,15 @@
 }
 
 .menu-entry.step-card-01 {
-  background: #fef08a; /* Bright Yellow */
+  background: #bae6fd; /* Soft Sky Blue */
 }
 
 .menu-entry.step-card-02 {
-  background: #fed7aa; /* Bright Peach Orange */
+  background: #fed7aa; /* Soft Orange Peach */
 }
 
 .menu-entry.step-card-03 {
-  background: #bbf7d0; /* Bright Mint Green */
+  background: #bbf7d0; /* Soft Mint Green */
 }
 
 .menu-entry.sold-out {
@@ -590,22 +631,30 @@
   opacity: 0.85;
 }
 
+/* FIT AND CENTER MENU IMAGES INSIDE THEIR BOX WITHOUT CROPPING */
 .menu-media-frame {
   aspect-ratio: 1 / 1;
   border-bottom: 2px solid #000000;
   position: relative;
   overflow: hidden;
-  background: #cbd5e1;
-  display: grid;
-  place-items: center;
+  background: #ffffff;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 8px;
   width: 100%;
+  box-sizing: border-box;
 }
 
 .menu-media-frame img {
-  width: 100%;
-  height: 100%;
-  object-fit: cover;
-  aspect-ratio: 1 / 1;
+  max-width: 100% !important;
+  max-height: 100% !important;
+  width: auto !important;
+  height: auto !important;
+  object-fit: contain !important;
+  object-position: center !important;
+  display: block;
+  margin: auto;
 }
 
 .menu-placeholder-glyph {
@@ -667,10 +716,10 @@
 .price-tag {
   font-family: var(--font-pixel);
   font-size: 0.74rem;
-  background: var(--yellow);
+  background: #ffffff;
   color: #000000;
   border: 2px solid #000000;
-  padding: 4px 6px;
+  padding: 3px 6px;
   display: inline-block;
   box-shadow: 2px 2px 0 #000000;
   white-space: nowrap !important;
@@ -706,7 +755,7 @@
 }
 
 .stepper-block button:hover:not(:disabled) {
-  background: var(--yellow);
+  background: #dbeafe;
 }
 
 .stepper-block button:active:not(:disabled) {
@@ -755,14 +804,16 @@
 .cart-item-row {
   border: 2px solid #000000;
   padding: 8px 10px;
-  background: #fffde7; /* Butter yellow tint */
+  background: #ffffff;
   display: flex;
   justify-content: space-between;
   align-items: center;
   flex-wrap: wrap;
   gap: 8px;
   box-shadow: 2px 2px 0 #000000;
-  width: 100%;
+  width: calc(100% - 6px);
+  max-width: calc(100% - 6px);
+  margin-right: auto;
 }
 
 @media (max-width: 500px) {
@@ -810,11 +861,14 @@
 
 .order-summary-box {
   border: 2.5px solid #000000;
-  background: var(--yellow);
+  background: #10b981; /* High-contrast Emerald Green */
+  color: #000000;
   padding: 10px 12px;
   margin-bottom: 12px;
   box-shadow: 2.5px 2.5px 0 #000000;
-  width: 100%;
+  width: calc(100% - 6px);
+  max-width: calc(100% - 6px);
+  margin-right: auto;
 }
 
 .order-summary-row {
@@ -836,14 +890,16 @@
 .payment-box {
   border: 3px solid #000000;
   background: #ffffff;
-  box-shadow: 4px 4px 0 #000000;
+  box-shadow: 3px 3px 0 #000000;
   padding: 16px;
   text-align: center;
   display: flex;
   flex-direction: column;
   align-items: center;
   gap: 14px;
-  width: 100%;
+  width: calc(100% - 6px);
+  max-width: calc(100% - 6px);
+  margin-right: auto;
 }
 
 /* Strictly square QRIS frame with solid white background */
@@ -854,7 +910,7 @@
   display: flex;
   align-items: center;
   justify-content: center;
-  box-shadow: 3px 3px 0 #000000;
+  box-shadow: 2.5px 2.5px 0 #000000;
   width: min(240px, 75vw);
   height: min(240px, 75vw);
   max-width: 100%;
@@ -901,15 +957,16 @@
 
 .pickup-ticket {
   border: 2.5px dashed #000000;
-  background: #fffde7;
+  background: #fef9c3;
   padding: 12px 16px;
-  width: 100%;
+  width: calc(100% - 6px);
   max-width: 440px;
   text-align: center;
   display: flex;
   flex-direction: column;
   gap: 6px;
   box-shadow: 2px 2px 0 #000000;
+  margin: 0 auto;
 }
 
 .pickup-ticket-name {
@@ -933,14 +990,16 @@
 .result-card {
   border: 3px solid #000000;
   background: #ffffff;
-  box-shadow: 4px 4px 0 #000000;
+  box-shadow: 3px 3px 0 #000000;
   padding: 20px;
   text-align: center;
   display: flex;
   flex-direction: column;
   align-items: center;
   gap: 12px;
-  width: 100%;
+  width: calc(100% - 6px);
+  max-width: calc(100% - 6px);
+  margin-right: auto;
 }
 
 .result-tag {
@@ -970,11 +1029,13 @@
   font-weight: 600;
   margin-bottom: 10px;
   box-shadow: 2px 2px 0 #000000;
-  width: 100%;
+  width: calc(100% - 6px);
+  max-width: calc(100% - 6px);
+  margin-right: auto;
 }
 
 .notice-warn {
-  background: #fff9c4;
+  background: #fef08a;
   border-color: #000000;
   color: #000000;
 }
@@ -994,7 +1055,7 @@
 /* ---------- Semantic Footer ---------- */
 .blog-footer {
   border-top: 3px solid #000000;
-  background: var(--surface-alt);
+  background: #e2e8f0;
   padding: 12px 16px;
   text-align: center;
   font-size: 0.85rem;

@@ -106,7 +106,7 @@ export default function Menu() {
             <span className="cart-top-title">🛒 CART: {totalQty} {totalQty === 1 ? 'ITEM' : 'ITEMS'}</span>
             <span className="cart-top-subtotal">SUBTOTAL: {formatRupiah(totalPrice)}</span>
           </div>
-          <Link to="/cart" className="btn btn-primary btn-sm" id="menu-view-cart-btn">
+          <Link to="/cart" className="btn btn-cart-review btn-sm" id="menu-view-cart-btn">
             [ VIEW CART &rarr; ]
           </Link>
         </aside>
