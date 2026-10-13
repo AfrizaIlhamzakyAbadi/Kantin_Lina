@@ -183,7 +183,7 @@ export default function Cart() {
             <h2 id="checkout-aside-heading">// PICKUP DETAILS</h2>
           </header>
 
-          <fieldset className="brutalist-fieldset">
+          <fieldset className="brutalist-fieldset fieldset-identity">
             <legend>1. CUSTOMER IDENTITY</legend>
             <label className="field" htmlFor="customer-name">
               <span>CALL NAME (REQUIRED):</span>
@@ -215,7 +215,7 @@ export default function Cart() {
             </label>
           </fieldset>
 
-          <fieldset className="brutalist-fieldset">
+          <fieldset className="brutalist-fieldset fieldset-pickup">
             <legend>2. PICKUP SLOT</legend>
             {days.length === 0 ? (
               <div className="notice notice-warn" role="status">

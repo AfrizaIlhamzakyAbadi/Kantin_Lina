@@ -16,20 +16,17 @@
   flex-direction: column;
 }
 
-/* Mobile: Minimise left-right borders; shadow tops right background to eliminate bright stripe */
+/* Mobile Phone: Remove background idea and shadow completely to maximise space utility */
 @media (max-width: 640px) {
   .site-wrapper {
-    margin-left: 5px;
-    margin-right: 0;
-    margin-top: 6px;
-    margin-bottom: 20px;
-    width: calc(100% - 9px);
-    max-width: calc(100% - 9px);
-    border-left: 2px solid #000000;
-    border-right: 2px solid #000000;
-    border-top: 3px solid #000000;
-    border-bottom: 3px solid #000000;
-    box-shadow: 4px 4px 0 #000000;
+    margin: 0 !important;
+    width: 100% !important;
+    max-width: 100% !important;
+    border-left: none !important;
+    border-right: none !important;
+    border-top: none !important;
+    border-bottom: 2px solid #000000 !important;
+    box-shadow: none !important;
   }
 }
 
@@ -42,8 +39,8 @@
 
 @media (max-width: 640px) {
   .site-content {
-    padding: 10px 10px 14px;
-    gap: 12px;
+    padding: 10px 10px 20px !important;
+    gap: 12px !important;
   }
 }
 
@@ -69,6 +66,14 @@
   flex-wrap: wrap;
   gap: 8px;
   border-bottom: 2px solid #000000;
+}
+
+@media (max-width: 440px) {
+  .header-banner {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 6px;
+  }
 }
 
 .brand-title {
@@ -134,11 +139,27 @@
   gap: 12px;
 }
 
+@media (max-width: 440px) {
+  .header-subtitle-bar {
+    flex-direction: column;
+    gap: 4px;
+    font-size: 0.62rem;
+  }
+}
+
 .blog-nav {
   display: flex;
   flex-wrap: wrap;
   background: #ffffff;
   border-top: 1px solid #000000;
+}
+
+/* If Cart is pushed to next line, Menu is also pushed so they are stacked */
+@media (max-width: 520px) {
+  .blog-nav {
+    flex-direction: column;
+    width: 100%;
+  }
 }
 
 .nav-link {
@@ -153,6 +174,18 @@
   align-items: center;
   gap: 6px;
   white-space: nowrap !important;
+}
+
+@media (max-width: 520px) {
+  .nav-link {
+    width: 100%;
+    border-right: none;
+    border-bottom: 2px solid #000000;
+    justify-content: flex-start;
+  }
+  .nav-link:last-child {
+    border-bottom: none;
+  }
 }
 
 .nav-link:hover {
@@ -197,6 +230,7 @@
   text-decoration: none;
   line-height: 1.25;
   white-space: nowrap !important;
+  max-width: 100%;
 }
 
 .btn:hover:not(:disabled) {
@@ -218,12 +252,13 @@
 }
 
 .btn-primary {
-  background: var(--yellow);
+  background: #00e676; /* High-contrast vivid green */
   color: #000000;
+  font-weight: bold;
 }
 
 .btn-primary:hover:not(:disabled) {
-  background: var(--yellow-hover);
+  background: #00ff88;
 }
 
 .btn-ghost {
@@ -273,6 +308,7 @@
   flex-direction: column;
   gap: 4px;
   margin-bottom: 10px;
+  width: 100%;
 }
 
 .field > span {
@@ -293,6 +329,7 @@
 .field select,
 .field textarea {
   width: 100%;
+  max-width: 100%;
   padding: 8px 10px;
   border: 2px solid #000000;
   background: #ffffff;
@@ -314,6 +351,7 @@
   display: grid;
   grid-template-columns: 1fr 1fr;
   gap: 10px;
+  width: 100%;
 }
 
 @media (max-width: 540px) {
@@ -323,11 +361,20 @@
 }
 
 .brutalist-fieldset {
-  border: 2px solid #000000;
+  border: 2.5px solid #000000;
   padding: 10px 12px;
   margin: 0 0 12px 0;
-  background: #fffdf5;
+  background: #fef3c7; /* Rich Amber */
   box-shadow: 2px 2px 0 #000000;
+  width: 100%;
+}
+
+.brutalist-fieldset.fieldset-identity {
+  background: #fef9c3; /* Sunny Pastel Yellow */
+}
+
+.brutalist-fieldset.fieldset-pickup {
+  background: #e0f2fe; /* Soft Sky Blue */
 }
 
 .brutalist-fieldset legend {
@@ -342,15 +389,16 @@
 
 /* ---------- Section Title & Headers ---------- */
 .page-headline {
-  border: 2px solid #000000;
-  background: #fffde7;
+  border: 2.5px solid #000000;
+  background: #ffe600; /* Rich Sunny Yellow */
   padding: 10px 12px;
   margin-bottom: 12px;
-  box-shadow: 2px 2px 0 #000000;
+  box-shadow: 2.5px 2.5px 0 #000000;
+  width: 100%;
 }
 
 .page-headline h1 {
-  font-size: 1.15rem;
+  font-size: clamp(0.95rem, 4vw, 1.15rem);
   margin-bottom: 6px;
 }
 
@@ -361,24 +409,78 @@
   line-height: 1.5;
 }
 
+/* ---------- Active Cart Bar at TOP of Menu Page (NOT on Bottom) ---------- */
+.cart-top-bar {
+  position: sticky;
+  top: 0px;
+  z-index: 40;
+  border: 2.5px solid #000000;
+  background: #ffe600;
+  color: #000000;
+  box-shadow: 3px 3px 0 #000000;
+  padding: 8px 12px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  flex-wrap: wrap;
+  gap: 8px;
+  margin-bottom: 12px;
+  width: 100%;
+}
+
+.cart-top-info {
+  display: flex;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 10px;
+  font-family: var(--font-pixel);
+  font-size: 0.74rem;
+}
+
+.cart-top-title {
+  font-weight: bold;
+}
+
+.cart-top-subtotal {
+  background: #ffffff;
+  border: 1.5px solid #000000;
+  padding: 2px 6px;
+  font-size: 0.7rem;
+}
+
+@media (max-width: 480px) {
+  .cart-top-bar {
+    flex-direction: column;
+    align-items: stretch;
+    gap: 6px;
+  }
+  .cart-top-bar .btn {
+    width: 100%;
+  }
+}
+
 /* ---------- Menu Item List & Categories (Colorful, Dense) ---------- */
 .menu-category-block {
   margin-bottom: 16px;
+  width: 100%;
 }
 
-/* Colorful, vibrant category headers without unnecessary black boxes */
+/* Colorful, vibrant category headers */
 .menu-category-header {
   padding: 8px 12px;
   font-family: var(--font-pixel);
-  font-size: 0.85rem;
+  font-size: clamp(0.75rem, 3vw, 0.85rem);
   margin-bottom: 10px;
   border: 2.5px solid #000000;
   box-shadow: 2.5px 2.5px 0 #000000;
   display: flex;
   align-items: center;
   justify-content: space-between;
+  flex-wrap: wrap;
+  gap: 4px;
   background: var(--yellow);
   color: #000000;
+  width: 100%;
 }
 
 .menu-category-header.cat-food {
@@ -402,7 +504,7 @@
 }
 
 .menu-category-header.cat-protocol {
-  background: var(--cyan);
+  background: #38bdf8;
   color: #000000;
 }
 
@@ -427,7 +529,7 @@
 }
 
 .menu-category-header h2 {
-  font-size: 0.88rem;
+  font-size: clamp(0.78rem, 3.2vw, 0.88rem);
   color: inherit;
 }
 
@@ -440,6 +542,7 @@
   display: grid;
   grid-template-columns: repeat(auto-fill, minmax(210px, 1fr));
   gap: 10px;
+  width: 100%;
 }
 
 @media (max-width: 600px) {
@@ -448,16 +551,42 @@
   }
 }
 
+/* Colorful High-Contrast Menu Cards */
 .menu-entry {
   border: 2.5px solid #000000;
   background: #ffffff;
   box-shadow: 2.5px 2.5px 0 #000000;
   display: flex;
   flex-direction: column;
+  width: 100%;
+}
+
+.menu-entry.cat-food {
+  background: #fed7aa; /* Warm Orange Peach */
+}
+
+.menu-entry.cat-drink {
+  background: #cffafe; /* Cool Sky Cyan */
+}
+
+.menu-entry.cat-other {
+  background: #d1fae5; /* Fresh Mint Green */
+}
+
+.menu-entry.step-card-01 {
+  background: #fef08a; /* Bright Yellow */
+}
+
+.menu-entry.step-card-02 {
+  background: #fed7aa; /* Bright Peach Orange */
+}
+
+.menu-entry.step-card-03 {
+  background: #bbf7d0; /* Bright Mint Green */
 }
 
 .menu-entry.sold-out {
-  background: #f1f5f9;
+  background: #e2e8f0 !important;
   opacity: 0.85;
 }
 
@@ -466,9 +595,10 @@
   border-bottom: 2px solid #000000;
   position: relative;
   overflow: hidden;
-  background: #e2e8f0;
+  background: #cbd5e1;
   display: grid;
   place-items: center;
+  width: 100%;
 }
 
 .menu-media-frame img {
@@ -504,6 +634,7 @@
   flex-direction: column;
   gap: 5px;
   flex: 1;
+  width: 100%;
 }
 
 .menu-entry-title {
@@ -528,13 +659,16 @@
   display: flex;
   align-items: center;
   justify-content: space-between;
+  flex-wrap: wrap;
   gap: 6px;
+  width: 100%;
 }
 
 .price-tag {
   font-family: var(--font-pixel);
   font-size: 0.74rem;
   background: var(--yellow);
+  color: #000000;
   border: 2px solid #000000;
   padding: 4px 6px;
   display: inline-block;
@@ -593,41 +727,13 @@
   font-weight: bold;
 }
 
-/* Floating Brutalist Cart Banner */
-.cart-floating-bar {
-  position: sticky;
-  bottom: 12px;
-  z-index: 50;
-  border: 3px solid #000000;
-  background: var(--yellow);
-  color: #000000;
-  box-shadow: 4px 4px 0 #000000;
-  padding: 10px 14px;
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  text-decoration: none;
-  font-family: var(--font-pixel);
-  font-size: 0.76rem;
-  margin-top: 12px;
-}
-
-.cart-floating-bar:hover {
-  background: var(--yellow-hover);
-  text-decoration: none;
-}
-
-.cart-floating-bar:active {
-  transform: translate(2px, 2px);
-  box-shadow: none;
-}
-
 /* ---------- Cart & Checkout Layout ---------- */
 .cart-layout {
   display: grid;
   grid-template-columns: 1.2fr 1fr;
   gap: 14px;
   align-items: start;
+  width: 100%;
 }
 
 @media (max-width: 768px) {
@@ -643,18 +749,28 @@
   display: flex;
   flex-direction: column;
   gap: 8px;
+  width: 100%;
 }
 
 .cart-item-row {
   border: 2px solid #000000;
   padding: 8px 10px;
-  background: #ffffff;
+  background: #fffde7; /* Butter yellow tint */
   display: flex;
   justify-content: space-between;
   align-items: center;
   flex-wrap: wrap;
   gap: 8px;
   box-shadow: 2px 2px 0 #000000;
+  width: 100%;
+}
+
+@media (max-width: 500px) {
+  .cart-item-row {
+    flex-direction: column;
+    align-items: stretch;
+    gap: 6px;
+  }
 }
 
 .cart-item-info strong {
@@ -677,6 +793,13 @@
   gap: 10px;
 }
 
+@media (max-width: 500px) {
+  .cart-item-controls {
+    justify-content: space-between;
+    width: 100%;
+  }
+}
+
 .cart-item-total {
   font-family: var(--font-pixel);
   font-size: 0.76rem;
@@ -686,11 +809,12 @@
 }
 
 .order-summary-box {
-  border: 2px solid #000000;
+  border: 2.5px solid #000000;
   background: var(--yellow);
   padding: 10px 12px;
   margin-bottom: 12px;
-  box-shadow: 2px 2px 0 #000000;
+  box-shadow: 2.5px 2.5px 0 #000000;
+  width: 100%;
 }
 
 .order-summary-row {
@@ -698,7 +822,7 @@
   justify-content: space-between;
   align-items: baseline;
   font-family: var(--font-pixel);
-  font-size: 0.78rem;
+  font-size: clamp(0.72rem, 3.2vw, 0.78rem);
 }
 
 .order-summary-row.total-row {
@@ -719,6 +843,7 @@
   flex-direction: column;
   align-items: center;
   gap: 14px;
+  width: 100%;
 }
 
 /* Strictly square QRIS frame with solid white background */
@@ -730,8 +855,9 @@
   align-items: center;
   justify-content: center;
   box-shadow: 3px 3px 0 #000000;
-  width: min(260px, 80vw);
-  height: min(260px, 80vw);
+  width: min(240px, 75vw);
+  height: min(240px, 75vw);
+  max-width: 100%;
   aspect-ratio: 1 / 1 !important;
   margin: 6px auto;
   box-sizing: border-box;
@@ -814,6 +940,7 @@
   flex-direction: column;
   align-items: center;
   gap: 12px;
+  width: 100%;
 }
 
 .result-tag {
@@ -843,6 +970,7 @@
   font-weight: 600;
   margin-bottom: 10px;
   box-shadow: 2px 2px 0 #000000;
+  width: 100%;
 }
 
 .notice-warn {
@@ -873,6 +1001,7 @@
   display: flex;
   flex-direction: column;
   gap: 4px;
+  width: 100%;
 }
 
 .footer-meta {

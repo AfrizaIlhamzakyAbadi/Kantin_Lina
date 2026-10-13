@@ -9,10 +9,10 @@
   --font-body: 'Cascadia Code', 'Fira Code', 'JetBrains Mono', Consolas, 'Source Code Pro', 'Courier New', monospace;
   --font-mono: 'Cascadia Code', Consolas, 'Courier New', monospace;
 
-  /* Vibrant, High-Contrast Palette */
-  --bg: #ffe600;
-  --surface: #ffffff;
-  --surface-alt: #f8fafc;
+  /* Palette: Warm retro tone for body, vibrant colors for objects */
+  --bg: #ece9d8;
+  --surface: #fffdf0;
+  --surface-alt: #fef9c3;
   --border: #000000;
 
   /* Text: Solid deep black for maximum contrast */
@@ -23,19 +23,23 @@
   --link: #0000ee;
   --link-visited: #551a8b;
 
-  /* Eye-popping Retro Colors */
+  /* Eye-popping Retro High-Contrast Colors */
   --yellow: #ffe600;
   --yellow-hover: #ffea2e;
   --orange: #ff5722;
+  --orange-light: #fed7aa;
   --cyan: #00d2ff;
+  --cyan-light: #cffafe;
   --green: #00e676;
+  --green-light: #d1fae5;
   --red: #ff1744;
+  --red-light: #fee2e2;
   --blue: #2563eb;
   --purple: #9333ea;
 
   /* Borders: Thick, crisp, solid black */
   --border-thick: 2.5px solid #000000;
-  --border-heavy: 3.5px solid #000000;
+  --border-heavy: 3px solid #000000;
   --border-thin: 2px solid #000000;
 
   /* Hard pixel drop shadows */
@@ -47,27 +51,23 @@
 *::before,
 *::after {
   box-sizing: border-box;
+  max-width: 100%;
   border-radius: 0 !important; /* Strict zero rounding */
   text-shadow: none !important;
   /* Prevent CLI-like mid-word character splits: wrap whole words only */
   word-break: normal !important;
   overflow-wrap: break-word;
   text-wrap: pretty;
-  hyphens: none !important;
-  -webkit-hyphens: none !important;
 }
 
 html {
   font-size: 15px;
-  background-color: #ffd000;
-  /* Retro energetic high-contrast arcade checkerboard pattern */
+  /* Restored classic desktop background (cancelled bright checkerboard) */
+  background-color: #ece9d8;
   background-image: 
-    linear-gradient(45deg, #00d2ff 25%, transparent 25%), 
-    linear-gradient(-45deg, #00d2ff 25%, transparent 25%), 
-    linear-gradient(45deg, transparent 75%, #00d2ff 75%), 
-    linear-gradient(-45deg, transparent 75%, #00d2ff 75%);
-  background-size: 20px 20px;
-  background-position: 0 0, 0 10px, 10px -10px, -10px 0px;
+    linear-gradient(to right, rgba(0, 0, 0, 0.05) 1px, transparent 1px),
+    linear-gradient(to bottom, rgba(0, 0, 0, 0.05) 1px, transparent 1px);
+  background-size: 16px 16px;
   color: var(--text);
   font-family: var(--font-body);
   font-weight: 500;
@@ -75,6 +75,14 @@ html {
   letter-spacing: -0.01em;
   overflow-x: hidden;
   -webkit-font-smoothing: antialiased;
+}
+
+/* Remove background idea on mobile phone screen to maximize space utility */
+@media (max-width: 640px) {
+  html, body {
+    background-color: #fffdf0 !important;
+    background-image: none !important;
+  }
 }
 
 body {
@@ -90,6 +98,7 @@ body {
   display: flex;
   flex-direction: column;
   min-height: 100vh;
+  width: 100%;
 }
 
 /* Headings with Pixel Art font */
@@ -129,7 +138,6 @@ strong, b {
 .sold-out-badge,
 .step-badge,
 .nav-badge,
-.nav-link,
 .result-tag,
 .btn,
 .price-tag,

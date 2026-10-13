@@ -12,7 +12,7 @@ const STEPS = [
   {
     num: '02',
     title: 'PAY WITH QRIS',
-    text: 'Scan the dynamic QR code within 3 minutes using any banking or e\u2011wallet app.',
+    text: 'Scan the dynamic QR code within 3 minutes using any banking or e-wallet app.',
   },
   {
     num: '03',
@@ -68,7 +68,7 @@ export default function Home() {
 
         <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(210px, 1fr))', gap: '10px' }}>
           {STEPS.map((step) => (
-            <article key={step.num} className="menu-entry" style={{ padding: '10px' }}>
+            <article key={step.num} className={`menu-entry step-card step-card-${step.num}`} style={{ padding: '10px' }}>
               <span className="step-badge">
                 STEP {step.num}
               </span>

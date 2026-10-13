@@ -4,12 +4,13 @@ import { useCart } from '../context/cartContext.js'
 import { formatRupiah } from '../lib/format.js'
 import { MAX_QTY_PER_ITEM } from '../lib/constants.js'
 
-function MenuCard({ item }) {
+function MenuCard({ item, category }) {
   const { qtyOf, setQty } = useCart()
   const qty = qtyOf(item.id)
+  const catClass = `cat-${(category || item.category || 'other').toLowerCase()}`
 
   return (
-    <article className={`menu-entry ${item.soldOut ? 'sold-out' : ''}`}>
+    <article className={`menu-entry ${catClass} ${item.soldOut ? 'sold-out' : ''}`}>
       <figure className="menu-media-frame">
         {item.imageUrl ? (
           <img src={item.imageUrl} alt={item.name} loading="lazy" />
@@ -98,6 +99,19 @@ export default function Menu() {
         <p>Select items to add to your cart, then proceed to pickup selection.</p>
       </header>
 
+      {/* Cart Active Notification / Popup at the TOP of the Menu page (NOT on bottom) */}
+      {totalQty > 0 && (
+        <aside className="cart-top-bar" id="menu-cart-bar" aria-label="Active Cart Summary">
+          <div className="cart-top-info">
+            <span className="cart-top-title">🛒 CART: {totalQty} {totalQty === 1 ? 'ITEM' : 'ITEMS'}</span>
+            <span className="cart-top-subtotal">SUBTOTAL: {formatRupiah(totalPrice)}</span>
+          </div>
+          <Link to="/cart" className="btn btn-primary btn-sm" id="menu-view-cart-btn">
+            [ VIEW CART &rarr; ]
+          </Link>
+        </aside>
+      )}
+
       {loading && <MenuSkeleton />}
 
       {!loading && error && (
@@ -124,20 +138,13 @@ export default function Menu() {
                 </header>
                 <div className="menu-grid">
                   {catItems.map((item) => (
-                    <MenuCard key={item.id} item={item} />
+                    <MenuCard key={item.id} item={item} category={category} />
                   ))}
                 </div>
               </section>
             )
           })}
         </div>
-      )}
-
-      {totalQty > 0 && (
-        <Link to="/cart" className="cart-floating-bar" id="menu-cart-bar">
-          <span>&gt;&gt; CART: {totalQty} {totalQty === 1 ? 'ITEM' : 'ITEMS'}</span>
-          <span>SUBTOTAL: {formatRupiah(totalPrice)} <span className="bracket-token">[ REVIEW &rarr; ]</span></span>
-        </Link>
       )}
     </section>
   )
