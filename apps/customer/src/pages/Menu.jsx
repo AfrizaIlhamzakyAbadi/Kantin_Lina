@@ -29,7 +29,7 @@ function MenuCard({ item }) {
           <span className="price-tag">{formatRupiah(item.price)}</span>
 
           {item.soldOut ? (
-            <span className="field small" style={{ fontWeight: 'bold' }}>[ UNAVAILABLE ]</span>
+            <span className="field small bracket-token" style={{ fontWeight: 'bold' }}>[ UNAVAILABLE ]</span>
           ) : qty === 0 ? (
             <button
               type="button"
@@ -120,7 +120,7 @@ export default function Menu() {
               <section key={category} className="menu-category-block" aria-labelledby={`cat-${category}`}>
                 <header className={`menu-category-header cat-${category.toLowerCase()}`}>
                   <h2 id={`cat-${category}`}>// {category.toUpperCase()}</h2>
-                  <span>[{catItems.length} ITEMS]</span>
+                  <span className="bracket-token">[{catItems.length} ITEMS]</span>
                 </header>
                 <div className="menu-grid">
                   {catItems.map((item) => (
@@ -136,7 +136,7 @@ export default function Menu() {
       {totalQty > 0 && (
         <Link to="/cart" className="cart-floating-bar" id="menu-cart-bar">
           <span>&gt;&gt; CART: {totalQty} {totalQty === 1 ? 'ITEM' : 'ITEMS'}</span>
-          <span>SUBTOTAL: {formatRupiah(totalPrice)} [ REVIEW &rarr; ]</span>
+          <span>SUBTOTAL: {formatRupiah(totalPrice)} <span className="bracket-token">[ REVIEW &rarr; ]</span></span>
         </Link>
       )}
     </section>

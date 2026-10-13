@@ -12,7 +12,7 @@ const STEPS = [
   {
     num: '02',
     title: 'PAY WITH QRIS',
-    text: 'Scan the dynamic QR code within 3 minutes using any banking or e-wallet app.',
+    text: 'Scan the dynamic QR code within 3 minutes using any banking or e\u2011wallet app.',
   },
   {
     num: '03',
@@ -40,11 +40,11 @@ export default function Home() {
         </div>
 
         <h1 id="home-headline">&gt; PRE-ORDER LUNCH. SKIP THE QUEUE.</h1>
-        <p style={{ margin: '8px 0 16px' }}>
+        <p style={{ margin: '6px 0 10px' }}>
           Welcome to the official Kantin Lina online bulletin. Order your food before break time, lock it in with instant QRIS payment, and collect your hot meal without queuing at the cashier.
         </p>
 
-        <div style={{ display: 'flex', gap: '10px', flexWrap: 'wrap', marginBottom: '14px' }}>
+        <div style={{ display: 'flex', gap: '8px', flexWrap: 'wrap', marginBottom: '10px' }}>
           <Link to="/menu" className="btn btn-primary btn-lg" id="home-browse-menu">
             &gt;&gt; BROWSE MENU
           </Link>
@@ -56,34 +56,34 @@ export default function Home() {
         </div>
 
         <small style={{ display: 'block', color: 'var(--text-muted)', fontFamily: 'var(--font-mono)' }}>
-          * Operational Days: {formatScheduleDays(schedule)} ({schedule.openTime}-{schedule.closeTime})
+          * Operational Days: {formatScheduleDays(schedule)} <span className="bracket-token">({schedule.openTime}-{schedule.closeTime})</span>
         </small>
       </section>
 
       {/* 3 Step System Protocol */}
-      <section aria-labelledby="protocol-title" style={{ marginTop: '24px' }}>
+      <section aria-labelledby="protocol-title" style={{ marginTop: '16px' }}>
         <header className="menu-category-header cat-protocol">
-          <h2 id="protocol-title">// SYSTEM PROTOCOL (3 EASY STEPS)</h2>
+          <h2 id="protocol-title">// SYSTEM PROTOCOL <span className="bracket-token">(3 EASY STEPS)</span></h2>
         </header>
 
-        <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(220px, 1fr))', gap: '14px' }}>
+        <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(210px, 1fr))', gap: '10px' }}>
           {STEPS.map((step) => (
-            <article key={step.num} className="menu-entry" style={{ padding: '14px' }}>
+            <article key={step.num} className="menu-entry" style={{ padding: '10px' }}>
               <span className="step-badge">
                 STEP {step.num}
               </span>
-              <h3 style={{ marginBottom: '6px' }}>{step.title}</h3>
-              <p style={{ fontSize: '0.95rem' }}>{step.text}</p>
+              <h3 style={{ marginBottom: '4px' }}>{step.title}</h3>
+              <p style={{ fontSize: '0.92rem' }}>{step.text}</p>
             </article>
           ))}
         </div>
       </section>
 
       {/* Terms & Conditions Section */}
-      <section aria-labelledby="terms-title" style={{ marginTop: '32px' }}>
+      <section aria-labelledby="terms-title" style={{ marginTop: '16px' }}>
         <header className="menu-category-header cat-terms">
           <h2 id="terms-title">// TERMS &amp; CONDITIONS</h2>
-          <span>[14 ARTICLES]</span>
+          <span className="bracket-token">[14 ARTICLES]</span>
         </header>
 
         <fieldset className="brutalist-fieldset">

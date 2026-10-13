@@ -1,21 +1,21 @@
 /* ==========================================================================
    Kantin Lina // Hybrid Pixel Art + Early 2000s Web 1.0 Aesthetic
-   High-Contrast, Vibrant Color Palette & Maximum Readability
+   High-Contrast, Vibrant Color Palette & Maximum Monospace Readability
    ========================================================================== */
 
 :root {
-  /* Typography: Pixel font for titles, thick readable system font for body */
+  /* Typography: Pixel font for titles, crisp readable monospace for body */
   --font-pixel: 'Press Start 2P', monospace;
-  --font-body: 'Segoe UI', -apple-system, BlinkMacSystemFont, Roboto, 'Helvetica Neue', Arial, sans-serif;
-  --font-mono: 'Consolas', 'Courier New', monospace;
+  --font-body: 'Cascadia Code', 'Fira Code', 'JetBrains Mono', Consolas, 'Source Code Pro', 'Courier New', monospace;
+  --font-mono: 'Cascadia Code', Consolas, 'Courier New', monospace;
 
   /* Vibrant, High-Contrast Palette */
-  --bg: #f8fafc;
+  --bg: #ffe600;
   --surface: #ffffff;
-  --surface-alt: #f1f5f9;
+  --surface-alt: #f8fafc;
   --border: #000000;
 
-  /* Text: Solid deep black for high contrast readability */
+  /* Text: Solid deep black for maximum contrast */
   --text: #000000;
   --text-muted: #1e293b;
 
@@ -26,21 +26,21 @@
   /* Eye-popping Retro Colors */
   --yellow: #ffe600;
   --yellow-hover: #ffea2e;
-  --orange: #ff6b35;
-  --cyan: #00b4d8;
-  --green: #10b981;
-  --red: #ff2a4b;
+  --orange: #ff5722;
+  --cyan: #00d2ff;
+  --green: #00e676;
+  --red: #ff1744;
   --blue: #2563eb;
-  --purple: #8b5cf6;
+  --purple: #9333ea;
 
   /* Borders: Thick, crisp, solid black */
-  --border-thick: 3px solid #000000;
-  --border-heavy: 4px solid #000000;
+  --border-thick: 2.5px solid #000000;
+  --border-heavy: 3.5px solid #000000;
   --border-thin: 2px solid #000000;
 
   /* Hard pixel drop shadows */
   --shadow-pixel: 3px 3px 0 #000000;
-  --shadow-pixel-lg: 5px 5px 0 #000000;
+  --shadow-pixel-lg: 4px 4px 0 #000000;
 }
 
 *,
@@ -49,23 +49,31 @@
   box-sizing: border-box;
   border-radius: 0 !important; /* Strict zero rounding */
   text-shadow: none !important;
+  /* Prevent CLI-like mid-word character splits: wrap whole words only */
+  word-break: normal !important;
+  overflow-wrap: break-word;
+  text-wrap: pretty;
+  hyphens: none !important;
+  -webkit-hyphens: none !important;
 }
 
 html {
-  font-size: 16px;
-  background-color: #fce7f3;
-  /* Retro energetic checkerboard pattern */
+  font-size: 15px;
+  background-color: #ffd000;
+  /* Retro energetic high-contrast arcade checkerboard pattern */
   background-image: 
-    linear-gradient(45deg, #f1f5f9 25%, transparent 25%), 
-    linear-gradient(-45deg, #f1f5f9 25%, transparent 25%), 
-    linear-gradient(45deg, transparent 75%, #f1f5f9 75%), 
-    linear-gradient(-45deg, transparent 75%, #f1f5f9 75%);
+    linear-gradient(45deg, #00d2ff 25%, transparent 25%), 
+    linear-gradient(-45deg, #00d2ff 25%, transparent 25%), 
+    linear-gradient(45deg, transparent 75%, #00d2ff 75%), 
+    linear-gradient(-45deg, transparent 75%, #00d2ff 75%);
   background-size: 20px 20px;
   background-position: 0 0, 0 10px, 10px -10px, -10px 0px;
   color: var(--text);
   font-family: var(--font-body);
-  font-weight: 500; /* Thicker normal text for superior readability */
-  line-height: 1.6;
+  font-weight: 500;
+  line-height: 1.55;
+  letter-spacing: -0.01em;
+  overflow-x: hidden;
   -webkit-font-smoothing: antialiased;
 }
 
@@ -73,6 +81,7 @@ body {
   margin: 0;
   padding: 0;
   min-height: 100vh;
+  overflow-x: hidden;
   display: flex;
   flex-direction: column;
 }
@@ -87,23 +96,48 @@ body {
 h1, h2, h3, h4, h5, h6 {
   font-family: var(--font-pixel);
   color: var(--text);
-  line-height: 1.45;
+  line-height: 1.4;
   letter-spacing: -0.02em;
   margin: 0;
-  word-break: break-word;
+  word-break: normal !important;
+  overflow-wrap: break-word;
 }
 
-h1 { font-size: 1.35rem; }
-h2 { font-size: 1.1rem; }
-h3 { font-size: 0.95rem; }
-h4 { font-size: 0.85rem; }
+h1 { font-size: 1.25rem; }
+h2 { font-size: 1.05rem; }
+h3 { font-size: 0.9rem; }
+h4 { font-size: 0.82rem; }
 
-/* Normal body text: bold, punchy, easily readable */
+/* Normal body text: monospace, bold, punchy, easily readable */
 p {
   margin: 0;
-  font-size: 1rem;
+  font-size: 0.96rem;
   font-weight: 500;
   color: #000000;
+  line-height: 1.55;
+  word-break: normal !important;
+  overflow-wrap: break-word;
+}
+
+strong, b {
+  font-weight: 700;
+}
+
+/* Bracketed chips and tokens wrap as whole unbroken units */
+.bracket-token,
+.header-status-badge,
+.sold-out-badge,
+.step-badge,
+.nav-badge,
+.nav-link,
+.result-tag,
+.btn,
+.price-tag,
+.notice strong,
+.menu-category-header span,
+.field small strong {
+  display: inline-block;
+  white-space: nowrap !important;
 }
 
 /* Links */

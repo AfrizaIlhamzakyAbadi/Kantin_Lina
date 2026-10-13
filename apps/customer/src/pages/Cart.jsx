@@ -133,7 +133,7 @@ export default function Cart() {
         <section aria-labelledby="cart-items-heading">
           <header className="menu-category-header cat-cart">
             <h2 id="cart-items-heading">// SELECTED ITEMS</h2>
-            <span>[{viewLines.length} LINES]</span>
+            <span className="bracket-token">[{viewLines.length} LINES]</span>
           </header>
 
           <ul className="cart-item-list">
@@ -143,7 +143,7 @@ export default function Cart() {
                   <strong>{line.name}</strong>
                   <span className="cart-item-price">@{formatRupiah(line.price)}</span>
                   {line.unavailable && (
-                    <p style={{ color: 'var(--accent-red)', fontWeight: 'bold', fontSize: '0.8rem' }}>
+                    <p style={{ color: 'var(--red)', fontWeight: 'bold', fontSize: '0.8rem' }} className="bracket-token">
                       [ ITEM SOLD OUT - REMOVE TO CONTINUE ]
                     </p>
                   )}
@@ -197,8 +197,7 @@ export default function Cart() {
                 onChange={(e) => setCustomerName(e.target.value)}
               />
               <small>
-                A daily queue number will be added (e.g.{' '}
-                <strong>{cleanName(customerName) || 'Budi'}-1</strong>).
+                A daily queue number will be added <span className="bracket-token">(e.g. <strong>{cleanName(customerName) || 'Budi'}-1</strong>)</span>.
               </small>
             </label>
 
@@ -247,7 +246,7 @@ export default function Cart() {
             )}
             <small style={{ display: 'block', marginTop: '6px', color: 'var(--text-muted)' }}>
               Operating hours: {formatScheduleDays(schedule)}, {schedule.openTime}-{schedule.closeTime}
-              {usingDefault && ' (default schedule)'}
+              {usingDefault && <span className="bracket-token"> (default schedule)</span>}
             </small>
           </fieldset>
 
