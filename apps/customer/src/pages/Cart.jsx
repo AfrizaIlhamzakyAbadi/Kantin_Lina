@@ -1,4 +1,4 @@
-import { useMemo, useState } from 'react'
+import { useEffect, useMemo, useState } from 'react'
 import { Link, useNavigate } from 'react-router-dom'
 import { useCart } from '../context/cartContext.js'
 import useMenu from '../hooks/useMenu.js'
@@ -9,7 +9,7 @@ import { setActiveOrder, clearActiveOrder } from '../lib/storage.js'
 import { formatRupiah } from '../lib/format.js'
 import { cleanName } from '../lib/orderName.js'
 import { resolveExpiry } from '../lib/payment.js'
-import { getPickupDays, getSlotsForDate, toPickupDate, formatScheduleDays } from '../lib/schedule.js'
+import { getPickupDays, getSlotsForDate, getSlotsWithAvailability, toPickupDate, formatScheduleDays } from '../lib/schedule.js'
 import { MAX_NAME_LENGTH, MAX_QTY_PER_ITEM, MIN_NAME_LENGTH } from '../lib/constants.js'
 
 export default function Cart() {
@@ -24,6 +24,13 @@ export default function Cart() {
   const [submitting, setSubmitting] = useState(false)
   const [cancellingPending, setCancellingPending] = useState(false)
   const [error, setError] = useState('')
+  const [now, setNow] = useState(() => new Date())
+
+  // Refresh current system time periodically so lead time dynamically updates
+  useEffect(() => {
+    const timer = setInterval(() => setNow(new Date()), 10000)
+    return () => clearInterval(timer)
+  }, [])
 
   // Show live menu prices, and flag lines whose item sold out or was removed.
   const menuById = useMemo(() => new Map(menuItems.map((m) => [m.id, m])), [menuItems])
@@ -40,10 +47,11 @@ export default function Cart() {
   const hasUnavailable = viewLines.some((l) => l.unavailable)
 
   // Pickup picker: only days/times the owner's schedule allows.
-  const days = useMemo(() => getPickupDays(schedule), [schedule])
+  const days = useMemo(() => getPickupDays(schedule, now), [schedule, now])
   const dayKey = days.some((d) => d.key === pickupDay) ? pickupDay : (days[0]?.key ?? '')
-  const slots = useMemo(() => (dayKey ? getSlotsForDate(schedule, dayKey) : []), [schedule, dayKey])
-  const timeValue = slots.includes(pickupTime) ? pickupTime : ''
+  const allSlots = useMemo(() => (dayKey ? getSlotsWithAvailability(schedule, dayKey, now) : []), [schedule, dayKey, now])
+  const validSlots = useMemo(() => allSlots.filter((s) => !s.disabled).map((s) => s.time), [allSlots])
+  const timeValue = validSlots.includes(pickupTime) ? pickupTime : ''
 
   // A QR that is still within its 3 minute window must be finished or cancelled first.
   const activeRemaining = useCountdown(activeOrder?.expiresAt ?? null)
@@ -92,6 +100,10 @@ export default function Cart() {
       setActiveOrder({
         orderId: data.orderId,
         pickupName: data.pickupName || pickupName,
+        customerName: data.customerName || pickupName,
+        order_tag: data.order_tag ?? null,
+        pickup_timestamp: data.pickup_timestamp || pickupAt,
+        created_at: data.created_at || new Date().toISOString(),
         pickupAt,
         notes: data.notes || orderNotes?.trim() || '',
         qrUrl: data.qrUrl ?? null,
@@ -237,8 +249,10 @@ export default function Cart() {
                   <span>TIME:</span>
                   <select id="pickup-time" value={timeValue} onChange={(e) => setPickupTime(e.target.value)}>
                     <option value="" disabled>Select time</option>
-                    {slots.map((slot) => (
-                      <option key={slot} value={slot}>{slot}</option>
+                    {allSlots.map(({ time, disabled }) => (
+                      <option key={time} value={time} disabled={disabled}>
+                        {time} {disabled ? '(too soon - min 10m)' : ''}
+                      </option>
                     ))}
                   </select>
                 </label>
@@ -290,7 +304,7 @@ export default function Cart() {
                   }
                 }}
               >
-                {cancellingPending ? 'CANCELLING...' : '[ CANCEL PENDING ORDER ]'}
+                {cancellingPending ? 'CANCELLING...' : '[cancel]'}
               </button>
             </div>
           )}

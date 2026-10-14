@@ -7,7 +7,7 @@ export default function Dashboard() {
   const [activeTab, setActiveTab] = useState('orders')
 
   const tabs = [
-    { id: 'orders', label: 'Order Monitor' },
+    { id: 'orders', label: 'Smart Queue' },
     { id: 'menu', label: 'Menu & Stock' },
     { id: 'schedule', label: 'Schedule' }
   ]

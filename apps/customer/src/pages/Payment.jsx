@@ -22,17 +22,28 @@ function DigitalCountdown({ remaining }) {
   )
 }
 
-function PickupTicket({ pickupName, pickupAt, notes }) {
+function PickupTicket({ orderTag, pickupName, pickupAt, notes, status }) {
+  const displayTag = orderTag || pickupName || '—'
   return (
     <article className="pickup-ticket">
       <small style={{ fontFamily: 'var(--font-pixel)', fontSize: '0.62rem' }}>
         *** OFFICIAL CALL TICKET ***
       </small>
-      <strong className="pickup-ticket-name" id="pickup-name">
-        {pickupName || '—'}
-      </strong>
+      <div style={{ margin: '8px 0' }}>
+        <span style={{ fontSize: '0.72rem', color: 'var(--text-muted)', display: 'block', marginBottom: '2px', fontFamily: 'var(--font-pixel)' }}>
+          ORDER TAG
+        </span>
+        <strong className="pickup-ticket-name" id="pickup-order-tag" style={{ fontSize: '1.8rem', display: 'block' }}>
+          {displayTag}
+        </strong>
+      </div>
+      {status && (
+        <div style={{ margin: '6px 0', fontFamily: 'var(--font-mono)', fontSize: '0.85rem' }}>
+          <strong>STATUS:</strong> <span style={{ textTransform: 'uppercase', color: 'var(--blue, #2563eb)', fontWeight: 'bold' }}>{status}</span>
+        </div>
+      )}
       {pickupAt && (
-        <small style={{ fontFamily: 'var(--font-mono)' }}>
+        <small style={{ fontFamily: 'var(--font-mono)', display: 'block', marginTop: '4px' }}>
           PICKUP TIME: {formatPickup(pickupAt)}
         </small>
       )}
@@ -68,8 +79,9 @@ export default function Payment() {
   }, [orderId])
 
   const status = String(order?.status ?? 'pending').toLowerCase()
-  const pickupName = order?.pickupName ?? mine?.pickupName ?? ''
-  const pickupAt = order?.pickupAt ?? mine?.pickupAt ?? null
+  const orderTag = order?.order_tag ?? mine?.order_tag ?? order?.pickupName ?? mine?.pickupName ?? ''
+  const pickupName = order?.customerName ?? order?.pickupName ?? mine?.pickupName ?? ''
+  const pickupAt = order?.pickup_timestamp ?? order?.pickupAt ?? mine?.pickup_timestamp ?? mine?.pickupAt ?? null
   const notes = order?.notes ?? mine?.notes ?? ''
 
   const expiresAt = order?.expiresAt?.toMillis?.() ?? mine?.expiresAt ?? null
@@ -132,8 +144,8 @@ export default function Payment() {
       <section className="result-card page-narrow" aria-labelledby="paid-title">
         <span className="result-tag success">[ ✓ PAYMENT CONFIRMED ]</span>
         <h1 id="paid-title">PAYMENT RECEIVED</h1>
-        <p>Your order is locked in. Show this call name at the counter:</p>
-        <PickupTicket pickupName={pickupName} pickupAt={pickupAt} notes={notes} />
+        <p>Your order is locked in. Show this order tag at the counter:</p>
+        <PickupTicket orderTag={orderTag} pickupName={pickupName} pickupAt={pickupAt} notes={notes} status="Paid" />
         {typeof order?.total === 'number' && (
           <p><strong>TOTAL PAID: {formatRupiah(order.total)}</strong></p>
         )}
@@ -238,7 +250,7 @@ export default function Payment() {
         onClick={handleCancelOrder}
         disabled={cancelling}
       >
-        {cancelling ? 'CANCELLING ORDER...' : '[ X CANCEL ORDER & RESTORE STOCK ]'}
+        {cancelling ? 'CANCELLING ORDER...' : '[cancel]'}
       </button>
 
       <p style={{ fontSize: '0.8rem', color: 'var(--text-muted)' }}>

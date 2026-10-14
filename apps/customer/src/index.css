@@ -166,6 +166,14 @@ strong, b {
   white-space: nowrap !important;
 }
 
+/* Dynamically unwrapped multiline bracket text */
+.bracket-unwrapped {
+  display: inline !important;
+  white-space: normal !important;
+  word-break: normal !important;
+  overflow-wrap: break-word !important;
+}
+
 /* Links */
 a {
   color: var(--link);

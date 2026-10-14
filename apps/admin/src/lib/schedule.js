@@ -18,7 +18,7 @@ export const DEFAULT_SCHEDULE = {
 }
 
 export const SLOT_MINUTES = 15 // granularity of the time picker
-export const MIN_LEAD_MINUTES = 30 // earliest pickup = now + this (kitchen prep)
+export const MIN_LEAD_MINUTES = 10 // Minimum Lead Time: earliest pickup = now + 10 mins
 export const BOOKING_WINDOW_DAYS = 7 // how far ahead customers may pre-order
 
 const DAY_NAMES = ['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat']
@@ -67,8 +67,8 @@ export function normalizeSchedule(raw) {
   return schedule
 }
 
-// Pickup slots ("08:00", "08:15", ...) available on a given YYYY-MM-DD.
-export function getSlotsForDate(schedule, dateKey, now = new Date()) {
+// Pickup slots with dynamic availability based on Minimum Lead Time (10 mins).
+export function getSlotsWithAvailability(schedule, dateKey, now = new Date()) {
   const date = fromDateKey(dateKey)
   if (!schedule.days.includes(date.getDay()) || schedule.closedDates.includes(dateKey)) {
     return []
@@ -81,9 +81,18 @@ export function getSlotsForDate(schedule, dateKey, now = new Date()) {
 
   const slots = []
   for (let minutes = open; minutes <= close; minutes += SLOT_MINUTES) {
-    if (minutes >= earliest) slots.push(minutesToHM(minutes))
+    const time = minutesToHM(minutes)
+    const disabled = isToday && minutes < earliest
+    slots.push({ time, disabled })
   }
   return slots
+}
+
+// Pickup slots ("08:00", "08:15", ...) available on a given YYYY-MM-DD.
+export function getSlotsForDate(schedule, dateKey, now = new Date()) {
+  return getSlotsWithAvailability(schedule, dateKey, now)
+    .filter((s) => !s.disabled)
+    .map((s) => s.time)
 }
 
 function formatDayLabel(date, offset) {

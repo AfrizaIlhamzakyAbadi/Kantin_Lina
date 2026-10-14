@@ -118,9 +118,37 @@ export async function recordPayment(env, { orderId, grossAmount, transactionId }
     }
 
     if (status === ORDER_STATUS.PENDING) {
-      tx.update(path, { status: ORDER_STATUS.PAID, paidAt: new Date(), transactionId: transactionId ?? null })
+      const now = new Date()
+      // Kantin Lina runs on WIB (UTC+7)
+      const wibOffsetMs = 7 * 60 * 60 * 1000
+      const wibDate = new Date(now.getTime() + wibOffsetMs)
+      const today = wibDate.toISOString().split('T')[0]
+      const counterPath = `counters/payment_${today}`
+
+      const counterDoc = (await tx.getAll([counterPath])).get(counterPath)
+      const count = (counterDoc?.data?.count || 0) + 1
+
+      if (counterDoc) {
+        tx.update(counterPath, { count })
+      } else {
+        tx.create(counterPath, { count })
+      }
+
+      const rawName = order.data.customerName || order.data.pickupName || 'Customer'
+      // Strip any previous "-<number>" to obtain clean base name
+      const baseName = rawName.replace(/-\d+$/, '').trim() || rawName.trim()
+      const order_tag = `${baseName}-${count}`
+
+      tx.update(path, {
+        status: ORDER_STATUS.PAID,
+        paidAt: now,
+        order_tag,
+        pickupName: order_tag,
+        transactionId: transactionId ?? null,
+      })
       return {
         result: 'paid',
+        order_tag,
         afterDeadline: expiresAt instanceof Date && Date.now() > expiresAt.getTime(),
       }
     }

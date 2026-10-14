@@ -6,8 +6,11 @@ import Menu from './pages/Menu.jsx'
 import Cart from './pages/Cart.jsx'
 import Payment from './pages/Payment.jsx'
 import NotFound from './pages/NotFound.jsx'
+import useBracketWrapping from './hooks/useBracketWrapping.js'
 
 export default function App() {
+  useBracketWrapping()
+
   return (
     <div className="site-wrapper">
       <Header />

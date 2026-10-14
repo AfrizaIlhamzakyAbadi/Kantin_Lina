@@ -91,12 +91,7 @@ function parseRequest(payload) {
 // Step 2: atomic stock check + deduction + order creation.
 async function reserveStock(env, { orderId, pickupName, pickupDate, items, notes }) {
   return runTransaction(env, async (tx) => {
-    // We use a counter for today to assign queue numbers (-1, -2, etc)
-    // Using Cloudflare Workers standard format YYYY-MM-DD in UTC or simple ISO
-    const today = new Date().toISOString().split('T')[0]
-    const counterPath = `counters/queue_${today}`
-    
-    const docs = await tx.getAll([counterPath, ...items.map((item) => `menu/${item.id}`)])
+    const docs = await tx.getAll(items.map((item) => `menu/${item.id}`))
 
     const lines = []
     const unavailable = []
@@ -135,17 +130,6 @@ async function reserveStock(env, { orderId, pickupName, pickupDate, items, notes
       )
     }
 
-    // Queue logic
-    const counterDoc = docs.get(counterPath)
-    const queueNumber = (counterDoc?.data?.count || 0) + 1
-    const finalPickupName = `${pickupName}-${queueNumber}`
-
-    if (counterDoc) {
-      tx.update(counterPath, { count: queueNumber })
-    } else {
-      tx.create(counterPath, { count: queueNumber })
-    }
-
     const total = lines.reduce((sum, l) => sum + l.price * l.qty, 0)
     const createdAt = new Date()
     const expiresAt = new Date(createdAt.getTime() + PAYMENT_WINDOW_MS)
@@ -154,17 +138,21 @@ async function reserveStock(env, { orderId, pickupName, pickupDate, items, notes
 
     tx.create(`orders/${orderId}`, {
       status: ORDER_STATUS.PENDING,
-      pickupName: finalPickupName,
+      customerName: pickupName,
+      pickupName,
+      order_tag: null, // assigned sequentially upon payment confirmation
+      pickup_timestamp: pickupDate,
       pickupAt: pickupDate,
+      created_at: createdAt,
+      createdAt,
       items: lines.map(({ id, name, price, qty }) => ({ id, name, price, qty })),
       total,
       notes: notes || '',
       stockDeducted: true, // lets releaseOrder() return the stock exactly once
-      createdAt,
       expiresAt,
     })
 
-    return { lines, total, expiresAt, finalPickupName, notes: notes || '' }
+    return { lines, total, createdAt, expiresAt, pickupName, pickupDate, notes: notes || '' }
   })
 }
 
@@ -225,7 +213,7 @@ export async function onRequestPost({ request, env }) {
     const reservation = await reserveStock(env, { orderId, pickupName, pickupDate, items, notes })
     stockReserved = true
 
-    const charge = await requestQris(env, { orderId, pickupName: reservation.finalPickupName, ...reservation })
+    const charge = await requestQris(env, { orderId, pickupName: reservation.pickupName, ...reservation })
     const qrAction = charge.actions?.find((a) => a.name === 'generate-qr-code')
 
     // Non-critical bookkeeping; the order is already valid without it.
@@ -236,7 +224,11 @@ export async function onRequestPost({ request, env }) {
     return json({
       orderId,
       status: ORDER_STATUS.PENDING,
-      pickupName: reservation.finalPickupName,
+      pickupName: reservation.pickupName,
+      customerName: reservation.pickupName,
+      order_tag: null,
+      pickup_timestamp: reservation.pickupDate.toISOString(),
+      created_at: reservation.createdAt.toISOString(),
       total: reservation.total,
       notes: reservation.notes,
       expiresAt: reservation.expiresAt.toISOString(),
