@@ -99,8 +99,13 @@ async function reserveStock(env, { orderId, pickupName, pickupDate, items, notes
       const doc = docs.get(`menu/${item.id}`)
       const stock = Number(doc?.data?.stock)
 
-      if (!doc || doc.data.available === false || !(stock >= item.qty)) {
-        unavailable.push({ id: item.id, name: doc?.data?.name ?? item.id })
+      // If stock is 0, item is marked unavailable, or stock is less than requested qty
+      if (!doc || doc.data.available === false || stock <= 0 || stock < item.qty) {
+        unavailable.push({
+          id: item.id,
+          name: doc?.data?.name ?? item.id,
+          stock: Number.isFinite(stock) ? stock : 0,
+        })
         continue
       }
 
@@ -120,12 +125,21 @@ async function reserveStock(env, { orderId, pickupName, pickupDate, items, notes
       })
     }
 
-    // Throwing here rolls the whole transaction back: nothing is deducted.
+    // Throwing here rolls the whole transaction back: nothing is deducted, no QRIS generated.
     if (unavailable.length > 0) {
+      const zeroItems = unavailable.filter((u) => u.stock <= 0)
+      if (zeroItems.length > 0) {
+        const zeroNames = zeroItems.map((u) => u.name).join(', ')
+        throw new HttpError(
+          409,
+          `Sorry, ${zeroNames} is out of stock (stock is 0). Please remove it from your cart.`,
+          { unavailable: unavailable.map((u) => u.id) },
+        )
+      }
       const names = unavailable.map((u) => u.name).join(', ')
       throw new HttpError(
         409,
-        `Sorry, ${names} just sold out or does not have enough left. Please update your cart.`,
+        `Sorry, ${names} does not have enough stock remaining. Please update your cart.`,
         { unavailable: unavailable.map((u) => u.id) },
       )
     }

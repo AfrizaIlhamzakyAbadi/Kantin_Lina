@@ -17,9 +17,10 @@ export const DEFAULT_SCHEDULE = {
   closedDates: [],
 }
 
-export const SLOT_MINUTES = 15 // granularity of the time picker
-export const MIN_LEAD_MINUTES = 10 // Minimum Lead Time: earliest pickup = now + 10 mins
+export const SLOT_MINUTES = 5 // 5-minute increments for kitchen batch cooking
+export const MIN_LEAD_MINUTES = 2 // Minimum Lead Time: earliest pickup = now + 2 mins
 export const BOOKING_WINDOW_DAYS = 7 // how far ahead customers may pre-order
+export const MINUTE_INCREMENTS = ['00', '05', '10', '15', '20', '25', '30', '35', '40', '45', '50', '55']
 
 const DAY_NAMES = ['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat']
 const MONDAY_FIRST = [1, 2, 3, 4, 5, 6, 0]
@@ -67,7 +68,65 @@ export function normalizeSchedule(raw) {
   return schedule
 }
 
-// Pickup slots with dynamic availability based on Minimum Lead Time (10 mins).
+// Hours available on a date, dynamically flagging any hour with no slots >= (now + 2m) as disabled
+export function getHoursForDate(schedule, dateKey, now = new Date()) {
+  const date = fromDateKey(dateKey)
+  if (!schedule.days.includes(date.getDay()) || schedule.closedDates.includes(dateKey)) {
+    return []
+  }
+
+  const open = toMinutes(schedule.openTime)
+  const close = toMinutes(schedule.closeTime)
+  const isToday = toDateKey(now) === dateKey
+  const earliest = isToday ? now.getHours() * 60 + now.getMinutes() + MIN_LEAD_MINUTES : 0
+
+  const startHour = Math.floor(open / 60)
+  const endHour = Math.floor(close / 60)
+
+  const hours = []
+  for (let h = startHour; h <= endHour; h++) {
+    const val = pad(h)
+    const hasValidMinute = MINUTE_INCREMENTS.some((m) => {
+      const minTotal = h * 60 + Number(m)
+      return minTotal >= open && minTotal <= close && (!isToday || minTotal >= earliest)
+    })
+
+    hours.push({
+      value: val,
+      label: `${val}:00`,
+      disabled: !hasValidMinute,
+    })
+  }
+  return hours
+}
+
+// Minutes (5-min increments: 00, 05, 10, ...) for a given hour on a date
+export function getMinutesForHour(schedule, dateKey, hourStr, now = new Date()) {
+  const date = fromDateKey(dateKey)
+  if (!schedule.days.includes(date.getDay()) || schedule.closedDates.includes(dateKey)) {
+    return []
+  }
+
+  const h = Number(hourStr)
+  if (!Number.isInteger(h) || h < 0 || h > 23) return []
+
+  const open = toMinutes(schedule.openTime)
+  const close = toMinutes(schedule.closeTime)
+  const isToday = toDateKey(now) === dateKey
+  const earliest = isToday ? now.getHours() * 60 + now.getMinutes() + MIN_LEAD_MINUTES : 0
+
+  return MINUTE_INCREMENTS.map((m) => {
+    const total = h * 60 + Number(m)
+    const outOfBounds = total < open || total > close
+    const tooSoon = isToday && total < earliest
+    return {
+      value: m,
+      disabled: outOfBounds || tooSoon,
+    }
+  })
+}
+
+// Pickup slots with dynamic availability based on Minimum Lead Time (2 mins, 5-min increments).
 export function getSlotsWithAvailability(schedule, dateKey, now = new Date()) {
   const date = fromDateKey(dateKey)
   if (!schedule.days.includes(date.getDay()) || schedule.closedDates.includes(dateKey)) {
@@ -88,7 +147,7 @@ export function getSlotsWithAvailability(schedule, dateKey, now = new Date()) {
   return slots
 }
 
-// Pickup slots ("08:00", "08:15", ...) available on a given YYYY-MM-DD.
+// Pickup slots ("08:00", "08:05", ...) available on a given YYYY-MM-DD.
 export function getSlotsForDate(schedule, dateKey, now = new Date()) {
   return getSlotsWithAvailability(schedule, dateKey, now)
     .filter((s) => !s.disabled)

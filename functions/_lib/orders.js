@@ -117,6 +117,43 @@ export async function recordPayment(env, { orderId, grossAmount, transactionId }
       return { result: 'amount-mismatch', status, expected: total, received: grossAmount }
     }
 
+    // Check if the payment was received after the 1-minute TTL
+    const orderCreatedAt = order.data.created_at || order.data.createdAt
+    const createdTimeMs =
+      orderCreatedAt instanceof Date
+        ? orderCreatedAt.getTime()
+        : expiresAt instanceof Date
+          ? expiresAt.getTime() - PAYMENT_WINDOW_MS
+          : 0
+
+    const isExpiredTTL = createdTimeMs > 0 && Date.now() > createdTimeMs + PAYMENT_WINDOW_MS
+
+    // If order was still Pending but payment arrived after the 1-minute TTL:
+    // Mark as Expired, atomically add reserved stock back to menu, flag late payment
+    if (status === ORDER_STATUS.PENDING && isExpiredTTL) {
+      if (order.data.stockDeducted === true) {
+        const items = order.data.items ?? []
+        const menu = await tx.getAll(items.map((item) => `menu/${item.id}`))
+        for (const item of items) {
+          const doc = menu.get(`menu/${item.id}`)
+          if (!doc) continue
+          tx.update(doc.path, { stock: (Number(doc.data.stock) || 0) + item.qty })
+        }
+      }
+
+      tx.update(path, {
+        status: ORDER_STATUS.EXPIRED,
+        stockDeducted: false,
+        closedAt: new Date(),
+        closeReason: 'payment-received-after-1m-ttl',
+        latePayment: true,
+        latePaymentAt: new Date(),
+        latePaymentAmount: grossAmount,
+        transactionId: transactionId ?? null,
+      })
+      return { result: 'late-payment', status: ORDER_STATUS.EXPIRED }
+    }
+
     if (status === ORDER_STATUS.PENDING) {
       const now = new Date()
       // Kantin Lina runs on WIB (UTC+7)
@@ -149,18 +186,20 @@ export async function recordPayment(env, { orderId, grossAmount, transactionId }
       return {
         result: 'paid',
         order_tag,
-        afterDeadline: expiresAt instanceof Date && Date.now() > expiresAt.getTime(),
+        afterDeadline: false,
       }
     }
 
-    // Expired or Failed: the stock has already gone back to the menu.
+    // Expired or Failed: stock has already gone back to the menu.
+    // Flag status as Expired, do NOT deduct stock a second time, record late payment to alert admin.
     tx.update(path, {
+      status: ORDER_STATUS.EXPIRED,
       latePayment: true,
       latePaymentAt: new Date(),
       latePaymentAmount: grossAmount,
       transactionId: transactionId ?? null,
     })
-    return { result: 'late-payment', status }
+    return { result: 'late-payment', status: ORDER_STATUS.EXPIRED }
   })
 }
 

@@ -1,11 +1,10 @@
 // Shared business constants for the pre-order flow.
 
-// Customers have exactly this long to pay the QRIS before the order expires.
-export const PAYMENT_WINDOW_MS = 3 * 60 * 1000
+// Customers have exactly 1 minute to pay the QRIS before the order expires.
+export const PAYMENT_WINDOW_MS = 1 * 60 * 1000
 
-// The server waits this long past `expiresAt` before expiring an unpaid order and
-// returning its stock, to absorb webhook delivery delay for last-second payments.
-export const EXPIRY_GRACE_MS = 30 * 1000
+// Strict TTL: 0 grace period so orders expire promptly after 1 minute
+export const EXPIRY_GRACE_MS = 0
 
 // UI-side cap per menu item. Stock is intentionally hidden from customers, so
 // the real stock check happens server-side at checkout.

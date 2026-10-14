@@ -9,7 +9,7 @@ import { setActiveOrder, clearActiveOrder } from '../lib/storage.js'
 import { formatRupiah } from '../lib/format.js'
 import { cleanName } from '../lib/orderName.js'
 import { resolveExpiry } from '../lib/payment.js'
-import { getPickupDays, getSlotsForDate, getSlotsWithAvailability, toPickupDate, formatScheduleDays } from '../lib/schedule.js'
+import { getPickupDays, getSlotsForDate, getHoursForDate, getMinutesForHour, toPickupDate, formatScheduleDays } from '../lib/schedule.js'
 import { MAX_NAME_LENGTH, MAX_QTY_PER_ITEM, MIN_NAME_LENGTH } from '../lib/constants.js'
 
 export default function Cart() {
@@ -20,7 +20,8 @@ export default function Cart() {
   const activeOrder = useActiveOrder()
 
   const [pickupDay, setPickupDay] = useState('')
-  const [pickupTime, setPickupTime] = useState('')
+  const [pickupHour, setPickupHour] = useState('')
+  const [pickupMinute, setPickupMinute] = useState('')
   const [submitting, setSubmitting] = useState(false)
   const [cancellingPending, setCancellingPending] = useState(false)
   const [error, setError] = useState('')
@@ -49,11 +50,25 @@ export default function Cart() {
   // Pickup picker: only days/times the owner's schedule allows.
   const days = useMemo(() => getPickupDays(schedule, now), [schedule, now])
   const dayKey = days.some((d) => d.key === pickupDay) ? pickupDay : (days[0]?.key ?? '')
-  const allSlots = useMemo(() => (dayKey ? getSlotsWithAvailability(schedule, dayKey, now) : []), [schedule, dayKey, now])
-  const validSlots = useMemo(() => allSlots.filter((s) => !s.disabled).map((s) => s.time), [allSlots])
-  const timeValue = validSlots.includes(pickupTime) ? pickupTime : ''
 
-  // A QR that is still within its 3 minute window must be finished or cancelled first.
+  // Available hours for the selected date
+  const hours = useMemo(() => (dayKey ? getHoursForDate(schedule, dayKey, now) : []), [schedule, dayKey, now])
+  const selectedHour = hours.some((h) => h.value === pickupHour && !h.disabled)
+    ? pickupHour
+    : (hours.find((h) => !h.disabled)?.value ?? '')
+
+  // Available 5-minute increments for the selected hour
+  const minutes = useMemo(
+    () => (dayKey && selectedHour ? getMinutesForHour(schedule, dayKey, selectedHour, now) : []),
+    [schedule, dayKey, selectedHour, now],
+  )
+  const selectedMinute = minutes.some((m) => m.value === pickupMinute && !m.disabled)
+    ? pickupMinute
+    : (minutes.find((m) => !m.disabled)?.value ?? '')
+
+  const timeValue = selectedHour && selectedMinute ? `${selectedHour}:${selectedMinute}` : ''
+
+  // A QR that is still within its 1 minute window must be finished or cancelled first.
   const activeRemaining = useCountdown(activeOrder?.expiresAt ?? null)
   const paymentInProgress = activeRemaining !== null && activeRemaining > 0
 
@@ -235,7 +250,7 @@ export default function Cart() {
                 {schedule.openTime}-{schedule.closeTime}.
               </div>
             ) : (
-              <div className="field-row">
+              <div style={{ display: 'flex', flexDirection: 'column', gap: '10px' }}>
                 <label className="field" htmlFor="pickup-day">
                   <span>DAY:</span>
                   <select id="pickup-day" value={dayKey} onChange={(e) => setPickupDay(e.target.value)}>
@@ -245,17 +260,43 @@ export default function Cart() {
                   </select>
                 </label>
 
-                <label className="field" htmlFor="pickup-time">
-                  <span>TIME:</span>
-                  <select id="pickup-time" value={timeValue} onChange={(e) => setPickupTime(e.target.value)}>
-                    <option value="" disabled>Select time</option>
-                    {allSlots.map(({ time, disabled }) => (
-                      <option key={time} value={time} disabled={disabled}>
-                        {time} {disabled ? '(too soon - min 10m)' : ''}
-                      </option>
-                    ))}
-                  </select>
-                </label>
+                <div className="field-row">
+                  <label className="field" htmlFor="pickup-hour">
+                    <span>HOUR:</span>
+                    <select
+                      id="pickup-hour"
+                      value={selectedHour}
+                      onChange={(e) => {
+                        setPickupHour(e.target.value)
+                        setPickupMinute('')
+                      }}
+                    >
+                      <option value="" disabled>Select hour</option>
+                      {hours.map((h) => (
+                        <option key={h.value} value={h.value} disabled={h.disabled}>
+                          {h.label} {h.disabled ? '(unavailable)' : ''}
+                        </option>
+                      ))}
+                    </select>
+                  </label>
+
+                  <label className="field" htmlFor="pickup-minute">
+                    <span>MINUTE (5-MIN BATCH):</span>
+                    <select
+                      id="pickup-minute"
+                      value={selectedMinute}
+                      disabled={!selectedHour}
+                      onChange={(e) => setPickupMinute(e.target.value)}
+                    >
+                      <option value="" disabled>Select minute</option>
+                      {minutes.map((m) => (
+                        <option key={m.value} value={m.value} disabled={m.disabled}>
+                          :{m.value} {m.disabled ? '(too soon - min 2m)' : ''}
+                        </option>
+                      ))}
+                    </select>
+                  </label>
+                </div>
               </div>
             )}
             <small style={{ display: 'block', marginTop: '6px', color: 'var(--text-muted)' }}>
@@ -330,7 +371,7 @@ export default function Cart() {
             {submitting ? 'GENERATING QRIS...' : '=== PAY WITH QRIS ==='}
           </button>
           <small style={{ display: 'block', textAlign: 'center', marginTop: '6px', color: 'var(--text-muted)' }}>
-            * You will have exactly 3 minutes to scan and pay.
+            * You will have exactly 1 minute to scan and pay.
           </small>
         </aside>
       </form>

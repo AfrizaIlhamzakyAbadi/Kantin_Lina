@@ -184,7 +184,7 @@ export default function Payment() {
         <p>
           {isCancelled
             ? 'This order was cancelled. Reserved items have been returned to stock.'
-            : 'Payment window was exceeded (3 minutes). Please start a fresh order.'}
+            : 'Payment window was exceeded (1 minute). Please start a fresh order.'}
         </p>
         {notes && <p><em>Note: &ldquo;{notes}&rdquo;</em></p>}
         <button type="button" className="btn btn-primary" id="payment-new-order" onClick={startNewOrder}>

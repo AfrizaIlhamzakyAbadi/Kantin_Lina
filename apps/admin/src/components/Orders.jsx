@@ -47,6 +47,7 @@ function getRelativeTimeBadge(timestampMs) {
 export default function Orders() {
   const [activeQueue, setActiveQueue] = useState([])
   const [completedOrders, setCompletedOrders] = useState([])
+  const [latePaymentOrders, setLatePaymentOrders] = useState([])
   const [showHistory, setShowHistory] = useState(false)
   const [completingId, setCompletingId] = useState(null)
   const [, setTick] = useState(0)
@@ -87,8 +88,14 @@ export default function Orders() {
         .filter((order) => order.status === 'Completed')
         .sort((a, b) => getTimestampMs(b.completedAt || b.created_at) - getTimestampMs(a.completedAt || a.created_at))
 
+      // Late payments: orders flagged latePayment (received after 1-minute TTL, stock already returned)
+      const late = all
+        .filter((order) => order.latePayment === true || (String(order.status).toLowerCase() === 'expired' && order.latePayment === true))
+        .sort((a, b) => getTimestampMs(b.latePaymentAt || b.closedAt) - getTimestampMs(a.latePaymentAt || a.closedAt))
+
       setActiveQueue(paidOrders)
       setCompletedOrders(completed)
+      setLatePaymentOrders(late)
     })
 
     return () => unsubscribe()
@@ -150,6 +157,73 @@ export default function Orders() {
           {showHistory ? 'Hide Completed History' : `View Completed History (${completedOrders.length})`}
         </button>
       </header>
+
+      {/* Late Payment Alerts (Edge Case: Webhook received settlement after 1-minute TTL) */}
+      {latePaymentOrders.length > 0 && (
+        <aside
+          role="alert"
+          style={{
+            background: 'var(--danger-soft, #fee2e2)',
+            border: '2px solid var(--danger, #ef4444)',
+            borderRadius: 'var(--radius)',
+            padding: '1.25rem',
+            marginBottom: '1.75rem',
+          }}
+        >
+          <div style={{ display: 'flex', alignItems: 'center', gap: '0.75rem', marginBottom: '0.4rem' }}>
+            <span style={{ fontSize: '1.4rem' }}>⚠️</span>
+            <h3 style={{ margin: 0, color: 'var(--danger, #dc2626)', fontSize: '1.15rem' }}>
+              ACTION REQUIRED: Late Payment Received ({latePaymentOrders.length})
+            </h3>
+          </div>
+          <p style={{ color: '#991b1b', fontSize: '0.9rem', marginBottom: '0.85rem' }}>
+            Payment settlement arrived <strong>after the 1-minute TTL expired</strong>. These orders remain marked as <strong>Expired</strong> and reserved items have already been returned to menu stock. A manual refund or kitchen operational override is required.
+          </p>
+
+          <div style={{ display: 'grid', gap: '0.6rem' }}>
+            {latePaymentOrders.map((order) => (
+              <div
+                key={order.id}
+                style={{
+                  background: 'var(--surface)',
+                  border: '1px solid var(--danger-soft, #fca5a5)',
+                  borderRadius: 'var(--radius-sm)',
+                  padding: '0.75rem 1rem',
+                  display: 'flex',
+                  justifyContent: 'space-between',
+                  alignItems: 'center',
+                  flexWrap: 'wrap',
+                  gap: '0.5rem',
+                }}
+              >
+                <div>
+                  <strong style={{ fontSize: '1rem', color: 'var(--danger)' }}>
+                    {order.order_tag || order.pickupName || 'Expired Order'}
+                  </strong>
+                  <span style={{ fontSize: '0.85rem', color: 'var(--text-muted)', marginLeft: '0.5rem' }}>
+                    ID: {order.id}
+                  </span>
+                  <div style={{ fontSize: '0.85rem', color: 'var(--text-muted)', marginTop: '0.2rem' }}>
+                    Amount: <strong>{formatRupiah(order.latePaymentAmount || order.total)}</strong> &bull; Late Payment Confirmed: {order.latePaymentAt ? formatPickupTime(order.latePaymentAt) : 'Yes'}
+                  </div>
+                </div>
+
+                <span style={{
+                  padding: '0.35rem 0.75rem',
+                  background: 'var(--danger)',
+                  color: '#ffffff',
+                  borderRadius: '6px',
+                  fontSize: '0.75rem',
+                  fontWeight: 700,
+                  letterSpacing: '0.04em',
+                }}>
+                  MANUAL REFUND OR OVERRIDE
+                </span>
+              </div>
+            ))}
+          </div>
+        </aside>
+      )}
 
       {/* Active Smart Queue List */}
       <section aria-labelledby="active-queue-heading">
