@@ -95,7 +95,7 @@ export default function Menu() {
   return (
     <section aria-labelledby="menu-main-title">
       <header className="page-headline">
-        <h1 id="menu-main-title">&gt; TODAY&apos;S CANTEEN MENU</h1>
+        <h1 id="menu-main-title">&gt; Available CANTEEN MENU</h1>
         <p>Select items to add to your cart, then proceed to pickup selection.</p>
       </header>
 
