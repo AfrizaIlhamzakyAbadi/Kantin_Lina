@@ -50,7 +50,7 @@ export default function Home() {
           </Link>
           {activeOrder && (
             <Link to={`/payment/${activeOrder.orderId}`} className="btn btn-ghost btn-lg" id="home-my-order">
-              VIEW MY ACTIVE TICKET
+              VIEW MY TICKET
             </Link>
           )}
         </div>
