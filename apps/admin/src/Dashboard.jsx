@@ -7,38 +7,37 @@ export default function Dashboard() {
   const [activeTab, setActiveTab] = useState('orders')
 
   const tabs = [
-    { id: 'orders', label: 'Smart Queue' },
-    { id: 'menu', label: 'Menu & Stock' },
-    { id: 'schedule', label: 'Schedule' }
+    { id: 'orders', label: '[ 01. SMART QUEUE ]' },
+    { id: 'menu', label: '[ 02. MENU & STOCK ]' },
+    { id: 'schedule', label: '[ 03. SCHEDULE ]' },
   ]
 
   return (
-    <div>
-      <div className="admin-tabs" style={{ display: 'flex', gap: '1rem', marginBottom: '2rem', borderBottom: '1px solid var(--border)', paddingBottom: '1rem' }}>
-        {tabs.map(tab => (
-          <button
-            key={tab.id}
-            onClick={() => setActiveTab(tab.id)}
-            style={{
-              padding: '0.75rem 1.5rem',
-              background: activeTab === tab.id ? 'var(--primary)' : 'transparent',
-              color: activeTab === tab.id ? '#fff' : 'var(--text)',
-              border: 'none',
-              borderRadius: 'var(--radius-sm)',
-              cursor: 'pointer',
-              fontWeight: activeTab === tab.id ? 'bold' : 'normal'
-            }}
-          >
-            {tab.label}
-          </button>
-        ))}
-      </div>
+    <div className="admin-dashboard-container">
+      {/* Navigation Toolbar */}
+      <nav className="blog-nav" aria-label="Admin Navigation" style={{ marginBottom: '16px' }}>
+        {tabs.map((tab) => {
+          const isActive = activeTab === tab.id
+          return (
+            <button
+              key={tab.id}
+              type="button"
+              id={`tab-${tab.id}`}
+              onClick={() => setActiveTab(tab.id)}
+              className={`nav-link ${isActive ? 'active' : ''}`}
+            >
+              <span>{tab.label}</span>
+            </button>
+          )
+        })}
+      </nav>
 
-      <div>
+      {/* Tab Panels */}
+      <section className="admin-tab-panel" aria-live="polite">
         {activeTab === 'orders' && <Orders />}
         {activeTab === 'menu' && <MenuManager />}
         {activeTab === 'schedule' && <ScheduleManager />}
-      </div>
+      </section>
     </div>
   )
 }

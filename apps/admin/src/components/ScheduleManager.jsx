@@ -2,106 +2,146 @@ import { useState, useEffect } from 'react'
 import { doc, getDoc, setDoc } from 'firebase/firestore'
 import { db } from '../firebase/config.js'
 
+const DAYS_LIST = ['monday', 'tuesday', 'wednesday', 'thursday', 'friday', 'saturday', 'sunday']
+
 export default function ScheduleManager() {
   const [days, setDays] = useState({
-    monday: true, tuesday: true, wednesday: true, thursday: true, friday: true, saturday: false, sunday: false
+    monday: true,
+    tuesday: true,
+    wednesday: true,
+    thursday: true,
+    friday: true,
+    saturday: false,
+    sunday: false,
   })
   const [openTime, setOpenTime] = useState('08:00')
   const [closeTime, setCloseTime] = useState('16:00')
   const [loading, setLoading] = useState(true)
+  const [statusMessage, setStatusMessage] = useState('')
 
   useEffect(() => {
     const fetchSchedule = async () => {
-      const docRef = doc(db, 'settings', 'schedule')
-      const snapshot = await getDoc(docRef)
-      if (snapshot.exists()) {
-        const data = snapshot.data()
-        setDays(data.days || days)
-        setOpenTime(data.openTime || '08:00')
-        setCloseTime(data.closeTime || '16:00')
+      try {
+        const docRef = doc(db, 'settings', 'schedule')
+        const snapshot = await getDoc(docRef)
+        if (snapshot.exists()) {
+          const data = snapshot.data()
+          setDays(data.days || days)
+          setOpenTime(data.openTime || '08:00')
+          setCloseTime(data.closeTime || '16:00')
+        }
+      } catch (err) {
+        console.error('Failed to fetch schedule:', err)
+      } finally {
+        setLoading(false)
       }
-      setLoading(false)
     }
     fetchSchedule()
   }, [])
 
   const handleSave = async (e) => {
     e.preventDefault()
+    setStatusMessage('')
     try {
       await setDoc(doc(db, 'settings', 'schedule'), {
         days,
         openTime,
-        closeTime
+        closeTime,
       })
-      alert('Schedule updated successfully!')
+      setStatusMessage('Schedule settings successfully saved!')
     } catch (err) {
       alert('Failed to save schedule: ' + err.message)
     }
   }
 
   const toggleDay = (day) => {
-    setDays(prev => ({ ...prev, [day]: !prev[day] }))
+    setDays((prev) => ({ ...prev, [day]: !prev[day] }))
   }
 
-  if (loading) return <div>Loading...</div>
+  if (loading) {
+    return (
+      <div className="notice notice-warn">
+        <strong>[ ⏳ LOADING SCHEDULE SETTINGS... ]</strong>
+      </div>
+    )
+  }
 
   return (
-    <div style={{ maxWidth: '600px' }}>
-      <h2>Store Schedule</h2>
-      <p style={{ color: 'var(--text-muted)', marginBottom: '2rem' }}>Configure the days and hours customers are allowed to pre-order.</p>
-      
-      <form onSubmit={handleSave} style={{ background: 'var(--surface)', padding: '2rem', borderRadius: 'var(--radius)', border: '1px solid var(--border)' }}>
-        
-        <div style={{ marginBottom: '2rem' }}>
-          <h3 style={{ marginBottom: '1rem' }}>Active Workdays</h3>
-          <div style={{ display: 'flex', gap: '0.5rem', flexWrap: 'wrap' }}>
-            {['monday', 'tuesday', 'wednesday', 'thursday', 'friday', 'saturday', 'sunday'].map(day => (
-              <button
-                key={day}
-                type="button"
-                onClick={() => toggleDay(day)}
-                style={{
-                  padding: '0.5rem 1rem',
-                  borderRadius: 'var(--radius-sm)',
-                  border: '1px solid var(--border)',
-                  background: days[day] ? 'var(--primary)' : 'var(--bg)',
-                  color: days[day] ? '#fff' : 'var(--text)',
-                  cursor: 'pointer',
-                  textTransform: 'capitalize'
-                }}
-              >
-                {day.slice(0, 3)}
+    <div style={{ maxWidth: '680px' }}>
+      {/* Page Headline */}
+      <section className="page-headline">
+        <h1>&gt; STORE SCHEDULE // OPERATIONAL HOURS</h1>
+        <p>Configure the days and operating hours customers are permitted to pre-order food online.</p>
+      </section>
+
+      {statusMessage && (
+        <div className="notice notice-success" role="status">
+          <strong>[ SUCCESS ]</strong> {statusMessage}
+        </div>
+      )}
+
+      <form onSubmit={handleSave}>
+        <fieldset className="brutalist-fieldset fieldset-schedule">
+          <legend>[ // CANTEEN PRE-ORDER SCHEDULE ]</legend>
+
+          <div style={{ display: 'flex', flexDirection: 'column', gap: '16px' }}>
+            <div>
+              <span style={{ fontFamily: 'var(--font-pixel)', fontSize: '0.72rem', display: 'block', marginBottom: '8px' }}>
+                ACTIVE OPERATIONAL WORKDAYS:
+              </span>
+              <div className="day-toggle-group">
+                {DAYS_LIST.map((day) => {
+                  const isActive = !!days[day]
+                  return (
+                    <button
+                      key={day}
+                      type="button"
+                      id={`day-toggle-${day}`}
+                      onClick={() => toggleDay(day)}
+                      className={`day-btn ${isActive ? 'active' : 'inactive'}`}
+                      aria-pressed={isActive}
+                    >
+                      {isActive ? `[ ${day.slice(0, 3)} ✓ ]` : `[ ${day.slice(0, 3)} - ]`}
+                    </button>
+                  )
+                })}
+              </div>
+              <small style={{ color: 'var(--text-muted)', fontSize: '0.86rem', marginTop: '6px', display: 'block' }}>
+                Click a day to toggle online pre-ordering availability.
+              </small>
+            </div>
+
+            <div className="field-row">
+              <div className="field">
+                <label htmlFor="open-time">Opening Time (WIB)</label>
+                <input
+                  id="open-time"
+                  type="time"
+                  value={openTime}
+                  onChange={(e) => setOpenTime(e.target.value)}
+                  required
+                />
+              </div>
+
+              <div className="field">
+                <label htmlFor="close-time">Closing Time (WIB)</label>
+                <input
+                  id="close-time"
+                  type="time"
+                  value={closeTime}
+                  onChange={(e) => setCloseTime(e.target.value)}
+                  required
+                />
+              </div>
+            </div>
+
+            <div style={{ marginTop: '8px' }}>
+              <button type="submit" className="btn btn-primary btn-block btn-lg" id="btn-save-schedule">
+                &gt;&gt; SAVE SCHEDULE SETTINGS
               </button>
-            ))}
+            </div>
           </div>
-        </div>
-
-        <div className="admin-schedule-times" style={{ display: 'flex', gap: '2rem', marginBottom: '2rem' }}>
-          <div style={{ flex: 1 }}>
-            <label style={{ display: 'block', marginBottom: '0.5rem', fontWeight: 'bold' }}>Opening Time</label>
-            <input 
-              type="time" 
-              value={openTime} 
-              onChange={e => setOpenTime(e.target.value)} 
-              required
-              style={{ width: '100%', padding: '0.75rem', borderRadius: 'var(--radius-sm)', border: '1px solid var(--border)' }}
-            />
-          </div>
-          <div style={{ flex: 1 }}>
-            <label style={{ display: 'block', marginBottom: '0.5rem', fontWeight: 'bold' }}>Closing Time</label>
-            <input 
-              type="time" 
-              value={closeTime} 
-              onChange={e => setCloseTime(e.target.value)} 
-              required
-              style={{ width: '100%', padding: '0.75rem', borderRadius: 'var(--radius-sm)', border: '1px solid var(--border)' }}
-            />
-          </div>
-        </div>
-
-        <button type="submit" style={{ width: '100%', padding: '1rem', background: 'var(--success)', color: '#fff', border: 'none', borderRadius: 'var(--radius-sm)', cursor: 'pointer', fontWeight: 'bold', fontSize: '1.1rem' }}>
-          Save Schedule Settings
-        </button>
+        </fieldset>
       </form>
     </div>
   )

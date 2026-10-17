@@ -1,127 +1,216 @@
-/* Design tokens + base styles */
+/* ==========================================================================
+   Kantin Lina Admin // Hybrid Pixel Art + Early 2000s Web 1.0 Aesthetic
+   High-Contrast, Diverse Color Palette & Maximum Monospace Readability
+   ========================================================================== */
+
 :root {
-  --bg: #fff8f1;
-  --bg-accent: #ffeedd;
+  /* Typography: Pixel font for titles, crisp readable monospace for body */
+  --font-pixel: 'Press Start 2P', monospace;
+  --font-body: 'Cascadia Code', 'Fira Code', 'JetBrains Mono', Consolas, 'Source Code Pro', 'Courier New', monospace;
+  --font-mono: 'Cascadia Code', Consolas, 'Courier New', monospace;
+
+  /* Palette: Crisp retro backgrounds and diverse high-contrast object colors */
+  --bg: #ece9d8;
   --surface: #ffffff;
-  --surface-2: #fff3e6;
-  --text: #2b1b12;
-  --text-muted: #7b6556;
-  --border: #f1e0d0;
+  --surface-alt: #f1f5f9;
+  --border: #000000;
 
-  --primary: #e4572e;
-  --primary-strong: #c9431c;
-  --primary-soft: rgba(228, 87, 46, 0.12);
-  --gradient: linear-gradient(135deg, #f0702f 0%, #e4572e 45%, #d63a52 100%);
-  --success: #1f9d63;
-  --success-soft: rgba(31, 157, 99, 0.12);
-  --danger: #d64545;
-  --danger-soft: rgba(214, 69, 69, 0.12);
-  --warn: #b7791f;
-  --warn-soft: rgba(245, 158, 11, 0.16);
+  /* Text: Solid deep black for maximum contrast */
+  --text: #000000;
+  --text-muted: #1e293b;
 
-  --radius: 18px;
-  --radius-sm: 12px;
-  --shadow-sm: 0 1px 2px rgba(80, 40, 10, 0.06), 0 2px 8px rgba(80, 40, 10, 0.05);
-  --shadow: 0 10px 30px -10px rgba(120, 50, 10, 0.25);
+  /* Classic Web 1.0 Links */
+  --link: #0000ee;
+  --link-visited: #551a8b;
 
-  --font-body: 'Inter', system-ui, 'Segoe UI', Roboto, sans-serif;
-  --font-head: 'Outfit', 'Inter', system-ui, sans-serif;
+  /* Diverse, Balanced High-Contrast Retro Colors */
+  --blue: #2563eb;
+  --blue-dark: #1d4ed8;
+  --blue-light: #dbeafe;
+  --cyan: #00b4d8;
+  --cyan-light: #cffafe;
+  --orange: #f97316;
+  --orange-light: #fed7aa;
+  --green: #10b981;
+  --green-light: #d1fae5;
+  --purple: #8b5cf6;
+  --purple-light: #ede9fe;
+  --coral: #ff5722;
+  --amber: #f59e0b;
+  --amber-light: #fef3c7;
+  --red: #ef4444;
+  --red-light: #fee2e2;
+  --yellow: #ffe600;
+  --yellow-hover: #ffea2e;
 
-  color-scheme: light dark;
-  font: 16px/1.55 var(--font-body);
-  color: var(--text);
-  background: var(--bg);
-  text-rendering: optimizeLegibility;
-  -webkit-font-smoothing: antialiased;
+  /* Primary Theme Brand Accent */
+  --primary: #ea580c;
+  --primary-strong: #c2410c;
+  --success: #10b981;
+  --danger: #ef4444;
+  --warn: #f59e0b;
+
+  /* Borders: Thick, crisp, solid black */
+  --border-thick: 2.5px solid #000000;
+  --border-heavy: 3px solid #000000;
+  --border-thin: 2px solid #000000;
+
+  /* Hard pixel drop shadows */
+  --shadow-pixel: 3px 3px 0 #000000;
+  --shadow-pixel-lg: 4px 4px 0 #000000;
 }
 
-@media (prefers-color-scheme: dark) {
-  :root {
-    --bg: #17100b;
-    --bg-accent: #24170f;
-    --surface: #211812;
-    --surface-2: #2b1f17;
-    --text: #f8ece1;
-    --text-muted: #b9a393;
-    --border: #3b2b20;
-    --primary: #ff7a4d;
-    --primary-strong: #ff9368;
-    --primary-soft: rgba(255, 122, 77, 0.16);
-    --success: #3ccf8e;
-    --success-soft: rgba(60, 207, 142, 0.14);
-    --danger: #ff6b6b;
-    --danger-soft: rgba(255, 107, 107, 0.14);
-    --warn: #f6b94c;
-    --warn-soft: rgba(246, 185, 76, 0.14);
-    --shadow-sm: 0 1px 2px rgba(0, 0, 0, 0.4);
-    --shadow: 0 12px 32px -12px rgba(0, 0, 0, 0.7);
-  }
+figure {
+  margin: 0 !important;
+  padding: 0 !important;
+  box-sizing: border-box !important;
+}
+
+a.btn,
+a.btn:visited {
+  text-decoration: none !important;
 }
 
 *,
 *::before,
 *::after {
   box-sizing: border-box;
+  max-width: 100%;
+  border-radius: 0 !important; /* Strict zero rounding */
+  text-shadow: none !important;
+  word-break: normal !important;
+  overflow-wrap: break-word;
+  text-wrap: pretty;
+}
+
+html {
+  font-size: 15px;
+  background-color: #ece9d8;
+  background-image: 
+    linear-gradient(to right, rgba(0, 0, 0, 0.05) 1px, transparent 1px),
+    linear-gradient(to bottom, rgba(0, 0, 0, 0.05) 1px, transparent 1px);
+  background-size: 16px 16px;
+  color: var(--text);
+  font-family: var(--font-body);
+  font-weight: 500;
+  line-height: 1.55;
+  letter-spacing: -0.01em;
+  overflow-x: clip;
+  -webkit-font-smoothing: antialiased;
+}
+
+@media (max-width: 640px) {
+  html, body {
+    background-color: #ffffff !important;
+    background-image: none !important;
+  }
 }
 
 body {
   margin: 0;
-  min-height: 100svh;
-  background:
-    radial-gradient(1100px 500px at 90% -10%, var(--bg-accent), transparent 60%),
-    var(--bg);
+  padding: 0;
+  min-height: 100vh;
+  overflow-x: clip;
+  display: flex;
+  flex-direction: column;
 }
 
 #root {
-  min-height: 100svh;
+  display: flex;
+  flex-direction: column;
+  min-height: 100vh;
+  width: 100%;
 }
 
-h1,
-h2,
-h3 {
-  font-family: var(--font-head);
+/* Headings with Pixel Art font */
+h1, h2, h3, h4, h5, h6 {
+  font-family: var(--font-pixel);
   color: var(--text);
-  line-height: 1.15;
+  line-height: 1.4;
+  letter-spacing: -0.02em;
   margin: 0;
-  letter-spacing: -0.01em;
+  word-break: normal !important;
+  overflow-wrap: break-word;
 }
 
-h1 { font-size: clamp(2rem, 5vw, 3.2rem); font-weight: 700; }
-h2 { font-size: 1.35rem; font-weight: 600; }
-h3 { font-size: 1.1rem; font-weight: 600; }
+h1 { font-size: 1.25rem; }
+h2 { font-size: 1.05rem; }
+h3 { font-size: 0.9rem; }
+h4 { font-size: 0.82rem; }
 
-p { margin: 0; }
-a { color: var(--primary); }
-img { max-width: 100%; display: block; }
-
-button,
-input,
-select {
-  font: inherit;
-  color: inherit;
+/* Normal body text: monospace, bold, punchy, easily readable */
+p {
+  margin: 0;
+  font-size: 0.96rem;
+  font-weight: 500;
+  color: #000000;
+  line-height: 1.55;
+  word-break: normal !important;
+  overflow-wrap: break-word;
 }
 
+strong, b {
+  font-weight: 700;
+}
+
+/* Bracketed chips and tokens wrap as whole unbroken units */
+.bracket-token,
+.header-status-badge,
+.sold-out-badge,
+.step-badge,
+.nav-badge,
+.result-tag,
+.btn,
+.price-tag,
+.notice strong,
+.menu-category-header span,
+.field small strong,
+.queue-pill,
+.order-badge {
+  display: inline-block;
+  white-space: nowrap !important;
+}
+
+/* Dynamically unwrapped multiline bracket text */
+.bracket-unwrapped {
+  display: inline !important;
+  white-space: normal !important;
+  word-break: normal !important;
+  overflow-wrap: break-word !important;
+}
+
+/* Links */
+a {
+  color: var(--link);
+  text-decoration: underline;
+  font-weight: 600;
+  cursor: pointer;
+}
+
+a:visited {
+  color: var(--link-visited);
+}
+
+a:hover {
+  background-color: var(--cyan-light);
+  color: #000000;
+  text-decoration: none;
+}
+
+img {
+  max-width: 100%;
+  display: block;
+}
+
+/* Harsh focus outline */
 :focus-visible {
-  outline: 3px solid var(--primary-soft);
-  outline-offset: 2px;
-  box-shadow: 0 0 0 2px var(--primary);
+  outline: 3px dashed #000000 !important;
+  outline-offset: 2px !important;
+  box-shadow: none !important;
 }
 
-@media (prefers-reduced-motion: reduce) {
-  *,
-  *::before,
-  *::after {
-    animation-duration: 0.01ms !important;
-    transition-duration: 0.01ms !important;
-  }
-}
-
-/* Responsive overrides for Admin */
-@media (max-width: 600px) {
-  .admin-tabs { flex-wrap: wrap; }
-  .admin-tabs button { flex: 1 1 calc(50% - 0.5rem); text-align: center; }
-  .admin-order-card { flex-direction: column; align-items: stretch !important; gap: 1rem; }
-  .admin-order-card > div:last-child { text-align: left !important; display: flex; justify-content: space-between; align-items: center; }
-  .admin-menu-form { grid-template-columns: 1fr !important; }
-  .admin-schedule-times { flex-direction: column; gap: 1rem !important; }
+/* Instant tactile interactions without delay */
+* {
+  transition: none !important;
+  animation-duration: 0s !important;
 }
